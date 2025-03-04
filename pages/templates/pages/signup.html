@@ -1,0 +1,45 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Login / Sign Up{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-toggle">
+        <button onclick="showForm('reader')">Reader</button>
+        <button onclick="showForm('publisher')">Publisher</button>
+    </div>
+    
+    <!-- แบบฟอร์มสำหรับ reader -->
+    <div id="reader-form" class="auth-form">
+        <h3>Signup สำหรับ Reader</h3>
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" placeholder="Username">
+            <input type="password" placeholder="Password">
+            <button type="submit"><a href="{% url 'login' %}">ยืนยัน</a></button>
+        </form>
+        <p>มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+    
+    <!-- แบบฟอร์มสำหรับ publisher (ซ่อนโดยเริ่มต้น) -->
+    <div id="publisher-form" class="auth-form" style="display:none;">
+        <h3>Signup สำหรับ Publisher</h3>
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" placeholder="Username">
+            <input type="password" placeholder="Password">
+            <button type="submit"><a href="{% url 'login' %}">ยืนยัน</a></button>
+        </form>
+        <p>มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+</div>
+
+<script>
+function showForm(userType) {
+    document.getElementById('reader-form').style.display = (userType === 'reader') ? 'block' : 'none';
+    document.getElementById('publisher-form').style.display = (userType === 'publisher') ? 'block' : 'none';
+}
+</script>
+{% endblock %}

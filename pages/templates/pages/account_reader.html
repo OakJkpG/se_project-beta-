@@ -1,0 +1,28 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Account - Reader{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <aside class="account-sidebar">
+        <h3>ประวัติการใช้งาน</h3>
+        <p>จำนวนหนังสือที่ยืม: 3 เล่ม</p>
+    </aside>
+    <section class="account-main">
+        <h3>รายการหนังสือที่ยืม</h3>
+        <ul>
+            <li>
+                หนังสือ A
+                <button>คืนหนังสือ</button>
+            </li>
+            <li>
+                หนังสือ B
+                <button>คืนหนังสือ</button>
+            </li>
+        </ul>
+    </section>
+    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+</div>
+{% endblock %}

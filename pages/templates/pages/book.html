@@ -1,0 +1,14 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Book Detail{% endblock %}
+
+{% block content %}
+<div class="book-detail">
+    <h2>ชื่อหนังสือ</h2>
+    <p>รายละเอียดของหนังสือ...</p>
+    <button>ยืมหนังสือ</button>
+    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+</div>
+{% endblock %}

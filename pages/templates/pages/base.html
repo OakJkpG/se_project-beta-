@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Book Hub{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <!-- อาจมีโลโก้ หรือ nav bar พื้นฐาน -->
+        {% block header %}
+        <h1>Book Hub</h1>
+        {% endblock %}
+    </header>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <footer>
+        {% block footer %}
+        <p>© 2025 Book Site. All rights reserved.</p>
+        {% endblock %}
+    </footer>
+</body>
+</html>

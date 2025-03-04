@@ -1,0 +1,35 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="search-filter">
+        <input type="text" placeholder="ค้นหาหนังสือ..." class="search-bar">
+        <!-- ตัวอย่าง filter -->
+        <select>
+            <option value="">เลือกประเภท</option>
+            <option value="novel">นิยาย</option>
+            <option value="comics">การ์ตูน</option>
+        </select>
+    </div>
+    
+    <div class="book-list">
+        <!-- สมมติว่ารายการหนังสือจะวนลูปแสดงที่นี่ -->
+        <ul>
+            <li><a href="{% url 'book' book_id=1 %}">หนังสือ A</a></li>
+            <li><a href="{% url 'book' book_id=2 %}">หนังสือ B</a></li>
+            <li><a href="{% url 'book' book_id=3 %}">หนังสือ C</a></li>
+        </ul>
+    </div>
+    
+    <nav class="tab-bar">
+        <a href="{% url 'main' %}">Main</a>
+        <a href="{% url 'account_publisher' %}">Account Publisher</a>
+        <a href="{% url 'account_reader' %}">Account Reader</a>
+        <!-- เพิ่มแท็บอื่น ๆ ตามต้องการ -->
+    </nav>
+</div>
+{% endblock %}

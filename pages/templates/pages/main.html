@@ -1,0 +1,12 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block title %}Main Page{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo"> -->
+    <p>ยินดีต้อนรับสู่เว็บไซต์ยืมหนังสือของเรา</p>
+    <a href="{% url 'login' %}" class="btn">Login</a>
+</div>
+{% endblock %}

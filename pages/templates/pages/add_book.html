@@ -1,0 +1,14 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Book Detail{% endblock %}
+
+{% block content %}
+<div class="add-book-detail">
+    <h2>ชื่อหนังสือ</h2>
+    <p>รายละเอียดของหนังสือ...</p>
+    <button>เพิ่มหนังสือ</button>
+    <a href="{% url 'account_publisher' %}" class="btn">กลับไปหน้า account_publisher</a>
+</div>
+{% endblock %}

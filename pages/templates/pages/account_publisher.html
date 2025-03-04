@@ -1,0 +1,29 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+
+{% block title %}Account - Publisher{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <aside class="account-sidebar">
+        <h3>ประวัติการใช้งาน</h3>
+        <p>จำนวนหนังสือที่ลง: 5 เล่ม</p>
+    </aside>
+    <section class="account-main">
+        <h3>รายการหนังสือที่ลง</h3>
+        <ul>
+            <a href="{% url 'add_book' %}" class="btn">เพิ่มหนังสือ</a>
+            <li>
+                หนังสือ A
+                <button><a href="{% url 'edit_book' %}" class="btn">แก้ไขหนังสือ</a></button>
+            </li>
+            <li>
+                หนังสือ B
+                <button><a href="{% url 'edit_book' %}" class="btn">แก้ไขหนังสือ</a></button>
+            </li>
+        </ul>
+    </section>
+    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+</div>
+{% endblock %}
