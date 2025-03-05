@@ -1,2 +1,1 @@
-web: gunicorn book_borrow.wsgi
-
+web: gunicorn myproject.wsgi:application
