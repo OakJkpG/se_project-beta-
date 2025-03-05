@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h_@tm6y@g!!ej@p3#69)x=y*0wz$uoj07s=okak&*ibh4%11!+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # หรือกำหนดโดเมนของคุณเอง
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -76,12 +76,11 @@ WSGI_APPLICATION = 'book_borrow.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # หรือฐานข้อมูลอื่นๆ
-        'NAME': 'BookHub',
-        'USER': 'OakJkpG',
-        'PASSWORD': 'WnbnpRFVlsvZ8xZG',
-        'HOST': 'your_database_host',
-        'PORT': 'your_database_port',
+        'ENGINE': 'djongo',
+        'NAME': 'BookHub_DB',
+        'CLIENT': {
+            'host': 'mongodb+srv://OakJkpG:WnbnpRFVlsvZ8xZG@cluster0.4q7uo.mongodb.net/',
+        }
     }
 }
 

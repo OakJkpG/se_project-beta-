@@ -1,0 +1,48 @@
+.welcome {
+    font-size: 3rem; /* Large font size */
+    font-weight: bold;
+    color: #e67e22; /* Orange color */
+    margin-bottom: 1.5rem; /* Space below the text */
+    text-align: center;
+}
+.button {
+    display: flex;
+    justify-content: center;  /* Center horizontally */
+    align-items: center;      /* Center vertically */
+    height: 100vh;            /* Ensure the body takes up full viewport height */
+    margin: 0;                /* Remove default margin */
+}
+
+.btn {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5rem 1.0rem;
+    border-radius: 9999px; /* Rounded edges */
+    background-color: #e67e22; /* Orange color */
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    justify-content: center;  /* Horizontally center the button text */
+    align-items: center;      /* Vertically center the button text */
+    width: auto;              /* Adjust width based on content */
+    max-width: 300px;         /* Set a maximum width */
+}
+body {
+    background-image: url("{% static 'images/background.jpg' %}");
+    background-size: cover; /* Ensures the image covers the entire page */
+    background-position: center; /* Keeps the image centered */
+    background-repeat: no-repeat; /* Prevents repeating the image */
+    height: 100vh; /* Makes the background cover the full viewport height */
+    margin: 0;
+}
+
+.main-container {
+    text-align: center; /* Centers content */
+    padding: 20px;
+}
+
+
+
