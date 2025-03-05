@@ -1,45 +1,98 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
-{% block title %}Login / Sign Up{% endblock %}
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-toggle">
-        <button onclick="showForm('reader')">Reader</button>
-        <button onclick="showForm('publisher')">Publisher</button>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <!-- Card wrapper สำหรับฟอร์ม Sign Up -->
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs" id="signupTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link active" 
+                id="reader-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#reader-form" 
+                type="button" 
+                role="tab" 
+                aria-controls="reader-form" 
+                aria-selected="true">
+                Reader
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                id="publisher-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#publisher-form" 
+                type="button" 
+                role="tab" 
+                aria-controls="publisher-form" 
+                aria-selected="false">
+                Publisher
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content" id="signupTabContent">
+            <!-- ฟอร์มสำหรับ Reader -->
+            <div class="tab-pane fade show active" id="reader-form" role="tabpanel" aria-labelledby="reader-tab">
+              <h4 class="card-title mb-4 text-center">Sign Up สำหรับ Reader</h4>
+              <form action="" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="reader-username" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="reader-username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="mb-3">
+                  <label for="reader-password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="reader-password" name="password" placeholder="Enter your password" required>
+                </div>
+                <div class="mb-3">
+                  <label for="reader-password2" class="form-label">Confirm Password</label>
+                  <input type="password" class="form-control" id="reader-password2" name="password2" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100"><a href="{% url 'login' %}">ลงทะเบียน</a></button>                  
+                  
+              </form>
+              <p class="text-center mt-3">มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+            <!-- ฟอร์มสำหรับ Publisher -->
+            <div class="tab-pane fade" id="publisher-form" role="tabpanel" aria-labelledby="publisher-tab">
+              <h4 class="card-title mb-4 text-center">Sign Up สำหรับ Publisher</h4>
+              <form action="" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="publisher-username" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="publisher-username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="mb-3">
+                  <label for="publisher-password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="publisher-password" name="password" placeholder="Enter your password" required>
+                </div>
+                <div class="mb-3">
+                  <label for="publisher-password2" class="form-label">Confirm Password</label>
+                  <input type="password" class="form-control" id="publisher-password2" name="password2" placeholder="Confirm your password" required>
+                </div>
+                <div class="mb-3">
+                  <label for="publisher-idcard" class="form-label">รหัสปชช.</label>
+                  <input type="text" class="form-control" id="publisher-idcard" name="idcard" placeholder="Enter your ID card number" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100"><a href="{% url 'login' %}">ลงทะเบียน</a></button>
+                  
+              </form>
+              <p class="text-center mt-3">มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+          </div><!-- End tab-content -->
+        </div>
+      </div><!-- End card -->
     </div>
-    
-    <!-- แบบฟอร์มสำหรับ reader -->
-    <div id="reader-form" class="auth-form">
-        <h3>Signup สำหรับ Reader</h3>
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="text" placeholder="Username">
-            <input type="password" placeholder="Password">
-            <button type="submit"><a href="{% url 'login' %}">ยืนยัน</a></button>
-        </form>
-        <p>มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
-    </div>
-    
-    <!-- แบบฟอร์มสำหรับ publisher (ซ่อนโดยเริ่มต้น) -->
-    <div id="publisher-form" class="auth-form" style="display:none;">
-        <h3>Signup สำหรับ Publisher</h3>
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="text" placeholder="Username">
-            <input type="password" placeholder="Password">
-            <button type="submit"><a href="{% url 'login' %}">ยืนยัน</a></button>
-        </form>
-        <p>มีบัญชีแล้ว? <a href="{% url 'login' %}">Login</a></p>
-    </div>
+  </div>
 </div>
-
-<script>
-function showForm(userType) {
-    document.getElementById('reader-form').style.display = (userType === 'reader') ? 'block' : 'none';
-    document.getElementById('publisher-form').style.display = (userType === 'publisher') ? 'block' : 'none';
-}
-</script>
 {% endblock %}

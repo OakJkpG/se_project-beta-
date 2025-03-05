@@ -1,14 +1,30 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
-{% block title %}Book Detail{% endblock %}
+{% block title %}เพิ่มหนังสือใหม่{% endblock %}
 
 {% block content %}
 <div class="add-book-detail">
-    <h2>ชื่อหนังสือ</h2>
-    <p>รายละเอียดของหนังสือ...</p>
-    <button>เพิ่มหนังสือ</button>
-    <a href="{% url 'account_publisher' %}" class="btn">กลับไปหน้า account_publisher</a>
+    <h2>เพิ่มหนังสือใหม่</h2>
+
+    <!-- Form สำหรับเพิ่มหนังสือ -->
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">ชื่อหนังสือ</label>
+            <input type="text" id="title" name="title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="description">รายละเอียด</label>
+            <textarea id="description" name="description" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="image_url">URL ของภาพปกหนังสือ</label>
+            <input type="url" id="image_url" name="image_url" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">เพิ่มหนังสือ</button>
+    </form>
+
+    <a href="{% url 'account_publisher' %}" class="btn mt-3">กลับไปหน้า account_publisher</a>
 </div>
 {% endblock %}

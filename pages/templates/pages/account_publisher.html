@@ -1,29 +1,55 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
 {% block title %}Account - Publisher{% endblock %}
 
 {% block content %}
-<div class="account-container">
-    <aside class="account-sidebar">
-        <h3>ประวัติการใช้งาน</h3>
-        <p>จำนวนหนังสือที่ลง: 5 เล่ม</p>
-    </aside>
-    <section class="account-main">
-        <h3>รายการหนังสือที่ลง</h3>
-        <ul>
-            <a href="{% url 'add_book' %}" class="btn">เพิ่มหนังสือ</a>
-            <li>
-                หนังสือ A
-                <button><a href="{% url 'edit_book' %}" class="btn">แก้ไขหนังสือ</a></button>
-            </li>
-            <li>
-                หนังสือ B
-                <button><a href="{% url 'edit_book' %}" class="btn">แก้ไขหนังสือ</a></button>
-            </li>
-        </ul>
-    </section>
-    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar ข้อมูลผู้ใช้ -->
+        <div class="col-md-3 bg-light p-3">
+            <div class="text-center">
+                <img src="{% static 'images/user-placeholder.png' %}" class="rounded-circle mb-3" width="60" height="60" alt="User Profile">
+                <h5>Title</h5>
+                <p class="text-muted">Publisher</p>
+            </div>
+            <hr>
+            <p><strong>วันที่สมัคร:</strong> 1/1/1999</p>
+            <p><strong>จำนวนหนังสือที่ลง:</strong> 10 เล่ม</p>
+            <button class="btn btn-dark w-100 mt-3">Log out</button>
+        </div>
+
+        <!-- Content รายการหนังสือ -->
+        <div class="col-md-9 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>หนังสือที่ลง</h3>
+                <a href="{% url 'add_book' %}" class="btn btn-secondary">เพิ่มหนังสือ</a>
+            </div>
+
+            <div class="row">
+                {% for book in books %}
+                <div class="col-md-6 mb-3">
+                    <div class="card p-3">
+                        <div class="d-flex">
+                            <!-- รูปภาพอยู่ด้านซ้าย -->
+                            <div class="me-3">
+                                <img src="{{ book.image_url }}" class="card-img-top" style="max-width: 150px; height: auto;" alt="{{ book.title }}">
+                            </div>
+                            <!-- ข้อมูลอยู่ด้านขวา -->
+                            <div>
+                                <h5>{{ book.title }}</h5>
+                                <p class="text-muted">Body text for whatever you’d like to say.</p>
+                                <a href="{% url 'remove_book' book_id=book.id %}" class="btn btn-light btn-sm">ถอนหนังสือ</a>
+                                <a href="{% url 'edit_book' %}" class="btn btn-secondary btn-sm">จัดการหนังสือ</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>ไม่มีหนังสือในขณะนี้</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

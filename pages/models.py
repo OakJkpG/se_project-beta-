@@ -1,3 +1,8 @@
-from django.db import models
+from djongo import models
 
-# Create your models here.
+class Book(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    image_url = models.URLField()
+
+

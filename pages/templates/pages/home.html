@@ -1,35 +1,54 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="home-container">
-    <div class="search-filter">
-        <input type="text" placeholder="ค้นหาหนังสือ..." class="search-bar">
-        <!-- ตัวอย่าง filter -->
-        <select>
-            <option value="">เลือกประเภท</option>
-            <option value="novel">นิยาย</option>
-            <option value="comics">การ์ตูน</option>
-        </select>
+<div class="home-container container-fluid">
+    <div class="row">
+        <a href="{% url 'main' %}" class="btn">Main</a>
+        <a href="{% url 'account_reader' %}" class="btn">Account Reader</a>
+        <a href="{% url 'account_publisher' %}" class="btn">Account Publisher</a>
+        
+        <!-- Sidebar หมวดหมู่หนังสือ -->
+        <div class="col-md-3">
+            <ul class="list-group">
+                <li class="list-group-item">Action Book</li>
+                <li class="list-group-item">Fantasy Book</li>
+                <li class="list-group-item">Study Book</li>
+                <li class="list-group-item">Home & Lifestyle Book</li>
+                <li class="list-group-item">Medicine Book</li>
+                <li class="list-group-item">Sports & Outdoor Book</li>
+                <li class="list-group-item">Cartoon Book</li>
+            </ul>
+        </div>
+
+        <!-- Content ด้านขวา -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <button class="btn btn-success">ยืมได้</button>
+                    <button class="btn btn-danger">ไม่สามารถยืมได้</button>
+                </div>
+                <input type="text" placeholder="ค้นหา" class="form-control w-25">
+            </div>
+
+            <div class="row">
+                {% for book in books %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <img src="{{ book.image_url }}" class="card-img-top" alt="{{ book.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.title }}</h5>
+                                <a href="{% url 'book' book_id=book.id %}" class="btn btn-primary">ดูรายละเอียด</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>ไม่มีหนังสือในขณะนี้</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    
-    <div class="book-list">
-        <!-- สมมติว่ารายการหนังสือจะวนลูปแสดงที่นี่ -->
-        <ul>
-            <li><a href="{% url 'book' book_id=1 %}">หนังสือ A</a></li>
-            <li><a href="{% url 'book' book_id=2 %}">หนังสือ B</a></li>
-            <li><a href="{% url 'book' book_id=3 %}">หนังสือ C</a></li>
-        </ul>
-    </div>
-    
-    <nav class="tab-bar">
-        <a href="{% url 'main' %}">Main</a>
-        <a href="{% url 'account_publisher' %}">Account Publisher</a>
-        <a href="{% url 'account_reader' %}">Account Reader</a>
-        <!-- เพิ่มแท็บอื่น ๆ ตามต้องการ -->
-    </nav>
 </div>
 {% endblock %}

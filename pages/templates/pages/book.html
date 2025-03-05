@@ -1,14 +1,25 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
 {% block title %}Book Detail{% endblock %}
 
 {% block content %}
-<div class="book-detail">
-    <h2>ชื่อหนังสือ</h2>
-    <p>รายละเอียดของหนังสือ...</p>
-    <button>ยืมหนังสือ</button>
-    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+<div class="d-flex justify-content-center mt-4">
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0 align-items-center">
+            <!-- Image on the left -->
+            <div class="col-md-4">
+                <img src="{{ book.image_url }}" class="img-fluid rounded-start" alt="{{ book.title }}">
+            </div>
+            <!-- Book details on the right -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">{{ book.description }}</p>
+                    <button class="btn btn-primary">ยืมหนังสือ</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,28 +1,47 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
-{% block title %}Account - Reader{% endblock %}
+{% block title %}Account - Publisher{% endblock %}
 
 {% block content %}
-<div class="account-container">
-    <aside class="account-sidebar">
-        <h3>ประวัติการใช้งาน</h3>
-        <p>จำนวนหนังสือที่ยืม: 3 เล่ม</p>
-    </aside>
-    <section class="account-main">
-        <h3>รายการหนังสือที่ยืม</h3>
-        <ul>
-            <li>
-                หนังสือ A
-                <button>คืนหนังสือ</button>
-            </li>
-            <li>
-                หนังสือ B
-                <button>คืนหนังสือ</button>
-            </li>
-        </ul>
-    </section>
-    <a href="{% url 'home' %}" class="btn">กลับไปหน้า Home</a>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar ข้อมูลผู้ใช้ -->
+        <div class="col-md-3 bg-light p-3">
+            <div class="text-center">
+                <img src="{% static 'images/user-placeholder.png' %}" class="rounded-circle mb-3" width="80" height="80" alt="User Profile">
+                <h5>Title</h5>
+                <p class="text-muted">Reader</p>
+            </div>
+            <hr>
+            <p><strong>วันที่สมัคร:</strong> 1/1/1999</p>
+            <p><strong>จำนวนหนังสือที่ยืม:</strong> 10 เล่ม</p>
+            <button class="btn btn-dark w-100 mt-3">Log out</button>
+        </div>
+
+        <!-- Content รายการหนังสือ -->
+        <div class="col-md-9 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>หนังสือที่ยืม</h3>
+            </div>
+
+            <div class="row">
+                {% for book in books %}
+                <div class="col-md-6 mb-3">
+                    <div class="card p-3">
+                        <div class="d-flex">
+                            <img src="{{ book.image_url }}" class="card-img-top" width="80" height="120" alt="{{ book.title }}">
+                            <div>
+                                <h5>{{ book.title }}</h5>
+                                <p class="text-muted">Body text for whatever you’d like to say.</p>
+                                <button class="btn btn-light btn-sm">คืนหนังสือ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

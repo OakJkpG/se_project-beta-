@@ -1,45 +1,32 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-
-{% block title %}Login / Sign Up{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-toggle">
-        <button onclick="showForm('reader')">Reader</button>
-        <button onclick="showForm('publisher')">Publisher</button>
-    </div>
-    
-    <!-- แบบฟอร์มสำหรับ reader -->
-    <div id="reader-form" class="auth-form">
-        <h3>Login สำหรับ Reader</h3>
-        <form action="" method="post">
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <!-- Card wrapper สำหรับฟอร์ม Login -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-4 text-center">Login</h4>
+          <form action="" method="post">
             {% csrf_token %}
-            <input type="text" placeholder="Username">
-            <input type="password" placeholder="Password">
-            <button type="submit"><a href="{% url 'home' %}">Login</a></button>
-        </form>
-        <p>ยังไม่มีบัญชี? <a href="{% url 'signup' %}">Sign Up</a></p>
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100"><a href="{% url 'home' %}">Login</a></button>
+          </form>
+          <p class="text-center mt-3">ยังไม่มีบัญชี? <a href="{% url 'signup' %}">Sign Up</a></p>
+        </div>
+      </div><!-- End Card -->
     </div>
-    
-    <!-- แบบฟอร์มสำหรับ publisher (ซ่อนโดยเริ่มต้น) -->
-    <div id="publisher-form" class="auth-form" style="display:none;">
-        <h3>Login สำหรับ Publisher</h3>
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="text" placeholder="Username">
-            <input type="password" placeholder="Password">
-            <button type="submit"><a href="{% url 'home' %}">Login</a></button>
-        </form>
-        <p>ยังไม่มีบัญชี? <a href="{% url 'signup' %}">Sign Up</a></p>
-    </div>
+  </div>
 </div>
-
-<script>
-function showForm(userType) {
-    document.getElementById('reader-form').style.display = (userType === 'reader') ? 'block' : 'none';
-    document.getElementById('publisher-form').style.display = (userType === 'publisher') ? 'block' : 'none';
-}
-</script>
 {% endblock %}
