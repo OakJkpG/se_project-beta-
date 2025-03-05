@@ -1,15 +1,4 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "SE_PROJECT-BETA-/wsgi.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/SE_PROJECT-BETA-/wsgi.py"
-    }
-  ]
+  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 }
