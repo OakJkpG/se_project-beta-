@@ -29,13 +29,15 @@
                 {% for book in books %}
                 <div class="col-md-6 mb-3">
                     <div class="card p-3">
-                        <div class="d-flex">
-                            <img src="{{ book.image_url }}" class="card-img-top" width="80" height="120" alt="{{ book.title }}">
-                            <div>
-                                <h5>{{ book.title }}</h5>
-                                <p class="text-muted">Body text for whatever you’d like to say.</p>
-                                <button class="btn btn-light btn-sm">คืนหนังสือ</button>
-                            </div>
+                        <!-- รูปภาพอยู่ด้านซ้าย -->
+                        <div class="me-3">
+                            <img src="{{ book.image_url }}" class="card-img-top" style="max-width: 150px; height: auto;" alt="{{ book.title }}">
+                        </div>
+                        <!-- ข้อมูลอยู่ด้านขวา -->
+                        <div>
+                            <h5>{{ book.title }}</h5>
+                            <p class="text-muted">Body text for whatever you’d like to say.</p>
+                            <button class="btn btn-light btn-sm">คืนหนังสือ</button>
                         </div>
                     </div>
                 </div>

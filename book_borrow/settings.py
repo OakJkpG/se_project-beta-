@@ -11,13 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from pymongo import MongoClient
-import os
-
-MONGO_URI = "mongodb+srv://OakJkpG:WnbnpRFVlsvZ8xZG@cluster0.4q7uo.mongodb.net/"
-client = MongoClient(MONGO_URI)
-db = client["BookHub_DB"]
-book_collection = db["test"]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,18 +73,6 @@ WSGI_APPLICATION = 'book_borrow.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'BookHub_DB',
-        'CLIENT': {
-            'host': 'mongodb+srv://OakJkpG:WnbnpRFVlsvZ8xZG@cluster0.4q7uo.mongodb.net/',
-        }
-    }
-}
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
