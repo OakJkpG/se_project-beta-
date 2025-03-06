@@ -1,30 +1,39 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Book Detail{% endblock %}
+{% block title %}แก้ไขหนังสือ{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="card p-4 shadow-sm">
-        <div class="row">
-            <!-- รูปภาพหนังสือ -->
-            <div class="col-md-4 text-center">
-                <img src="{% static 'images/book-placeholder.png' %}" class="img-fluid rounded" alt="Book Image">
-            </div>
-            
-            <!-- รายละเอียดหนังสือ -->
-            <div class="col-md-8">
-                <h2>{{ book.title }}</h2>
-                <p class="text-muted">หมวดหมู่: {{ book.category }}</p>
-                <p>{{ book.description }}</p>
+        <h2 class="text-center">แก้ไขหนังสือ</h2>
 
-                <!-- ปุ่มจัดการหนังสือ -->
-                <div class="mt-3">
-                    <a href="{% url 'edit_book' %}" class="btn btn-secondary">แก้ไขหนังสือ</a>
-                    <a href="{% url 'account_publisher' %}" class="btn btn-light">กลับไปหน้า Account</a>
-                </div>
+        <!-- ฟอร์มแก้ไขหนังสือ -->
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="title" class="form-label">ชื่อหนังสือ</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ book.title }}" required>
             </div>
-        </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">หมวดหมู่</label>
+                <input type="text" id="category" name="category" class="form-control" value="{{ book.category }}">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">รายละเอียด</label>
+                <textarea id="description" name="description" class="form-control" required>{{ book.description }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="image_url" class="form-label">URL ของภาพปก</label>
+                <input type="url" id="image_url" name="image_url" class="form-control" value="{{ book.image_url }}" required>
+            </div>
+
+            <!-- ปุ่มบันทึก -->
+            <button type="submit" class="btn btn-primary w-100">บันทึกการเปลี่ยนแปลง</button>
+        </form>
+
+        <!-- ปุ่มกลับ -->
+        <a href="{% url 'account_publisher' %}" class="btn btn-light mt-3 w-100">กลับไปหน้า Account</a>
     </div>
 </div>
 {% endblock %}

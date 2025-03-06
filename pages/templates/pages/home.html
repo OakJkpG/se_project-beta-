@@ -6,10 +6,7 @@
 {% block content %}
 <div class="home-container container-fluid">
     <div class="row">
-        <a href="{% url 'main' %}" class="btn">Main</a>
-        <a href="{% url 'account_reader' %}" class="btn">Account Reader</a>
-        <a href="{% url 'account_publisher' %}" class="btn">Account Publisher</a>
-        
+
         <!-- Sidebar หมวดหมู่หนังสือ -->
         <div class="col-md-3">
             <ul class="list-group">
@@ -30,7 +27,9 @@
                     <button class="btn btn-success">ยืมได้</button>
                     <button class="btn btn-danger">ไม่สามารถยืมได้</button>
                 </div>
-                <input type="text" placeholder="ค้นหา" class="form-control w-25">
+                <form method="get">
+                    <input type="text" name="search" placeholder="ค้นหา" class="form-control w-25" value="{{ request.GET.search }}">
+                </form>                
             </div>
 
             <div class="row">

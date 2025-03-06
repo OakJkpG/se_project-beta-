@@ -11,6 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from pymongo import MongoClient
+import os
+
+MONGO_URI = "mongodb+srv://OakJkpG:awZfdwaIMPNiHPNP@cluster0.aeia6.mongodb.net/"
+client = MongoClient(MONGO_URI)
+db = client["BookHub_DB"]
+book_collection = db["books"]
+user_collection = db["users"]
+
+# ในไฟล์ settings.py
+LOGIN_URL = '/login/'  # หรือ '/login' ก็ได้ ขึ้นอยู่กับว่า URL ของคุณกำหนดไว้ตรงไหน
+LOGIN_REDIRECT_URL = '/'  # หรือหน้าอื่นๆ ที่คุณต้องการให้ไป
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,6 +86,18 @@ WSGI_APPLICATION = 'book_borrow.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'BookHub_DB',
+        'CLIENT': {
+            'host': 'mongodb+srv://OakJkpG:WnbnpRFVlsvZ8xZG@cluster0.4q7uo.mongodb.net/',
+        }
+    }
+}
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -114,3 +138,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # ใช้การบันทึก session ในฐานข้อมูล
+# settings.py
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # คุณอาจมี backends อื่นๆ ตามที่คุณใช้
+]

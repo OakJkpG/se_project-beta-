@@ -1,7 +1,7 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Account - Publisher{% endblock %}
+{% block title %}account_publisher{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -9,14 +9,14 @@
         <!-- Sidebar ข้อมูลผู้ใช้ -->
         <div class="col-md-3 bg-light p-3">
             <div class="text-center">
-                <img src="{% static 'images/user-placeholder.png' %}" class="rounded-circle mb-3" width="60" height="60" alt="User Profile">
-                <h5>Title</h5>
+                <img src="https://as1.ftcdn.net/jpg/03/34/40/16/1000_F_334401628_sLDpXQ952ArVfG8vl96aReNA68iT4Zsm.jpg" width="60" height="60" alt="User Profile">
+                <h5>{{ user.username }}</h5>
                 <p class="text-muted">Publisher</p>
             </div>
             <hr>
-            <p><strong>วันที่สมัคร:</strong> 1/1/1999</p>
-            <p><strong>จำนวนหนังสือที่ลง:</strong> 10 เล่ม</p>
-            <button class="btn btn-dark w-100 mt-3">Log out</button>
+            <p><strong>วันที่สมัคร:</strong> {{ registration_date }}</p>
+            <p><strong>จำนวนหนังสือที่ลง:</strong> {{ book_count }} เล่ม</p>
+            <a href="{% url 'logout' %}" class="btn btn-dark w-100 mt-3">Log out</a>
         </div>
 
         <!-- Content รายการหนังสือ -->
@@ -28,26 +28,29 @@
 
             <div class="row">
                 {% for book in books %}
-                <div class="col-md-6 mb-3">
-                    <div class="card p-3">
-                        <div class="d-flex">
-                            <!-- รูปภาพอยู่ด้านซ้าย -->
-                            <div class="me-3">
-                                <img src="{{ book.image_url }}" class="card-img-top" style="max-width: 150px; height: auto;" alt="{{ book.title }}">
-                            </div>
-                            <!-- ข้อมูลอยู่ด้านขวา -->
-                            <div>
-                                <h5>{{ book.title }}</h5>
-                                <p class="text-muted">Body text for whatever you’d like to say.</p>
-                                <a href="{% url 'remove_book' book_id=book.id %}" class="btn btn-light btn-sm">ถอนหนังสือ</a>
-                                <a href="{% url 'edit_book' %}" class="btn btn-secondary btn-sm">จัดการหนังสือ</a>
+                    {% if book.publisher == user.username %}  <!-- แสดงเฉพาะหนังสือของ Publisher นี้ -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3">
+                                <div class="d-flex">
+                                    <!-- รูปภาพอยู่ด้านซ้าย -->
+                                    <div class="me-3">
+                                        <img src="{{ book.image_url }}" class="card-img-top" style="max-width: 150px; height: auto;" alt="{{ book.title }}">
+                                    </div>
+                                    <!-- ข้อมูลอยู่ด้านขวา -->
+                                    <div>
+                                        <h5>{{ book.title }}</h5>
+                                        <p class="text-muted">{{ book.description }}</p>
+                                        <a href="{% url 'remove_book' book.id %}" class="btn btn-light btn-sm">ถอนหนังสือ</a>
+                                        <a href="{% url 'edit_book' book.id %}" class="btn btn-secondary btn-sm">จัดการหนังสือ</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    {% endif %}
                 {% empty %}
-                <p>ไม่มีหนังสือในขณะนี้</p>
+                    <p>ไม่มีหนังสือในขณะนี้</p>
                 {% endfor %}
+
             </div>
         </div>
     </div>

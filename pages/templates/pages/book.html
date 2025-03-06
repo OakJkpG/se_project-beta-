@@ -1,7 +1,7 @@
 {% extends "pages/base.html" %}
 {% load static %}
 
-{% block title %}Book Detail{% endblock %}
+{% block title %}Book{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-center mt-4">
@@ -16,7 +16,19 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
                     <p class="card-text">{{ book.description }}</p>
-                    <button class="btn btn-primary">ยืมหนังสือ</button>
+                    {% if request.session.username %}
+                        {% if user.role == "reader" %}
+                            <form method="POST" action="{% url 'borrow_book' book.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                                <button type="submit" class="btn btn-primary">ยืมหนังสือ</button>
+                            </form>
+                        {% else %}
+                            <p class="text-danger">คุณต้องเป็น Reader เพื่อยืมหนังสือ</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-danger">คุณต้องเข้าสู่ระบบก่อน</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
