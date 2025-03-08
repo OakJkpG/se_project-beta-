@@ -24,7 +24,8 @@ BookHub/
 │   ├── Dockerfile       
 │   └── Procfile          
 │
-│── frontend/            
+│── frontend/
+│   ├── dir/  
 │   ├── src/             
 │   │   ├── pages/       
 │   │   │   ├── Home.jsx 
@@ -37,9 +38,9 @@ BookHub/
 │   ├── node_modules/
 │   ├── .gitignore
 │   ├── eslint.config.js       
-│   ├── index.html  
-│   ├── package-lock.json       
+│   ├── index.html     
 │   ├── package.json            
 │   └── vite.config.js   
-│── README.md            
+│── README.md 
+│── docker-compose.yml            
 └── .gitignore           

@@ -9,16 +9,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=True
-      - DATABASE_HOST=db  # ✅ ช่วยให้ Django รู้ว่าต้องเชื่อมต่อกับ `db` container
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=bookhub_db
-      - DATABASE_USER=user
-      - DATABASE_PASSWORD=password
+      - DATABASE_URL=postgres://user:password@db:5432/bookhub_db
     depends_on:
       db:
-        condition: service_healthy  # ✅ รอจนกว่า `db` จะพร้อมใช้งาน
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
   frontend:
     build:
@@ -28,7 +21,7 @@ services:
     volumes:
       - ./frontend:/usr/src/app
       - node_modules:/usr/src/app/node_modules
-    command: sh -c "yarn install --frozen-lockfile && yarn dev"
+    command: sh -c "yarn install && yarn dev"
 
   db:
     image: postgres:13
@@ -40,22 +33,7 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-    healthcheck:  # ✅ ตรวจสอบว่า PostgreSQL พร้อมให้ backend เชื่อมต่อหรือยัง
-      test: ["CMD-SHELL", "pg_isready -U user -d bookhub_db"]
-      interval: 10s
-      retries: 5
-      timeout: 5s
-    
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    depends_on:
-       - db
+
 
 volumes:
   postgres_data:
-  node_modules:
