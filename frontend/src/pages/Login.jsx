@@ -1,67 +1,69 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../index.css';
+import { Link, useNavigate } from 'react-router-dom'; // นำเข้า useNavigate
+import axios from 'axios';
+import './Auth.css';
 
 const Login = () => {
-  const navigate = useNavigate();
-
-  // State สำหรับเก็บข้อมูลการกรอกฟอร์ม
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState(''); // รับค่าจากผู้ใช้ (email หรือ username)
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
-  // ฟังก์ชั่นสำหรับส่งข้อมูลเมื่อทำการ login
+  const navigate = useNavigate(); // สร้างฟังก์ชัน navigate เพื่อเปลี่ยนเส้นทาง
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // ส่งข้อมูลไปยัง backend (เช่น ผ่าน API)
     try {
-      // สร้าง payload สำหรับ login
-      const response = await fetch('http://localhost:8000/api/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const Data = await response.json();
-
-      if (response.ok) {
-        // หาก login สำเร็จ, นำผู้ใช้ไปที่หน้า home หรือหน้าอื่น ๆ
-        navigate('/home');
-      } else {
-        alert('Username or Password is incorrect');
-      }
-    } catch (error) {
-      alert('Error during login');
-      console.error(error);
+      const response = await axios.post('http://127.0.0.1:8000/api/login/', { identifier, password });
+      
+      const { token, role } = response.data; // ดึง token และ role จาก response
+  
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role); // เก็บ role ลง localStorage
+  
+      console.log("Token:", token);
+      console.log("Role:", role);
+      
+      // เช็คว่า role ถูกเก็บใน localStorage หรือไม่
+      console.log("Role from localStorage:", localStorage.getItem('role'));
+  
+      navigate('/main'); // รีไดเร็กต์ไปที่ MainPage หลังจาก Login สำเร็จ
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     }
   };
+  
+  
 
   return (
-    <div className="login-container">
-      <h2>Login to BookHub</h2>
+    <div className="auth-page">
+      <h2>Login</h2>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
+          <label>Email or Username:</label>
+          <input 
+            type="text" 
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required 
           />
         </div>
         <div>
-          <label>Password</label>
-          <input
-            type="password"
+          <label>Password:</label>
+          <input 
+            type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            required 
           />
         </div>
         <button type="submit">Login</button>
       </form>
+      <p>
+        Don't have an account?&nbsp;
+        <Link to="/signup/reader">Signup as Reader</Link> |&nbsp;
+        <Link to="/signup/publisher">Signup as Publisher</Link>
+      </p>
     </div>
   );
 };

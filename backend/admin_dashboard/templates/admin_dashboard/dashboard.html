@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - BookHub</title>
+  <!-- ใช้ Bootstrap เพื่อให้หน้าดูดีขึ้น -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+    }
+    .section {
+      margin-bottom: 3rem;
+    }
+    .table th, .table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .container {
+      max-width: 1200px;
+      margin-top: 20px;
+    }
+    .table-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="my-4">Admin Dashboard</h1>
+    <p>Welcome, {{ request.user.username }} | <a href="{% url 'admin_logout' %}">Logout</a></p>
+
+    <!-- ข้อความแจ้งเตือน -->
+    {% if messages %}
+      <div class="alert alert-info">
+        <ul class="mb-0">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Section: Publisher Registrations Pending Approval -->
+    <div class="section">
+      <h2>Pending Publisher Registrations</h2>
+      {% if pending_publishers %}
+        <div class="table-container">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for publisher in pending_publishers %}
+                <tr>
+                  <td>{{ publisher.email }}</td>
+                  <td>{{ publisher.first_name }}</td>
+                  <td>
+                    <a href="{% url 'approve_publisher' publisher.id %}" class="btn btn-success btn-sm">Approve</a>
+                    <a href="{% url 'reject_publisher' publisher.id %}" class="btn btn-danger btn-sm">Reject</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p>No pending publisher registrations.</p>
+      {% endif %}
+    </div>
+
+    <!-- Section: All Users -->
+    <div class="section">
+      <h2>All Users</h2>
+      <div class="table-container">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in all_users %}
+              <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.profile.user_type }}</td>
+                <td>{{ user.is_active }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section: All Books -->
+    <div class="section">
+      <h2>All Books</h2>
+      <div class="table-container">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Publisher</th>
+              <th>Borrow Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for book in all_books %}
+              <tr>
+                <td>{{ book.id }}</td>
+                <td>{{ book.title }}</td>
+                <td>{{ book.publisher.first_name }}</td>
+                <td>{{ book.borrow_count }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- เพิ่ม Bootstrap JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

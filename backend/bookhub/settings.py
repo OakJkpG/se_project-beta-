@@ -25,23 +25,67 @@ SECRET_KEY = 'django-insecure-#54x6t*cin_7-301e+9vw+&8fxc558*7nm1ruiz$*034ja)b)q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
-
+LOGIN_URL = '/adminpanel/login/'  # กำหนด URL ของหน้า login สำหรับ admin
+LOGIN_REDIRECT_URL = '/adminpanel/dashboard/'  # หลังจาก login สำเร็จให้ redirect ไปที่ dashboard
 # Application definition
 
+# bookhub/settings.py
 INSTALLED_APPS = [
-    'rest_framework',
-    'corsheaders',
-    'books',
-    'users',
+    # แอปหลักของ Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # แอปของบุคคลที่สาม
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+
+    # แอปของโปรเจค
+    'users',
+    'books',             # <-- ต้องมีแอปนี้
+    'admin_dashboard',   # <-- ถ้ามี
 ]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # ต้องอยู่ด้านบน
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# อนุญาตให้ทุก origin เชื่อมต่อ (สำหรับพัฒนา)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# ตั้งค่า Email (สำหรับ demo ส่งไปที่ console)
+# ตั้งค่า Email Backend (ใช้ SMTP)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# SMTP Configuration (ตัวอย่างใช้ Gmail)
+EMAIL_HOST = "smtp.gmail.com"       # SMTP Server ของ Gmail
+EMAIL_PORT = 587                    # ใช้ Port 587 สำหรับ TLS
+EMAIL_USE_TLS = True                # เปิดใช้งาน TLS
+EMAIL_HOST_USER = "bookhub.noreply@gmail.com"  # อีเมลของคุณ
+EMAIL_HOST_PASSWORD = "asyi watf scne bjav" # รหัสผ่าน หรือ App Password (ดูข้อ 2)
+DEFAULT_FROM_EMAIL = "BookHub <bookhub.noreply@gmail.com>"  # ชื่อผู้ส่ง (เปลี่ยนได้)
+
+
+# ตั้งค่า REST Framework (ตัวอย่าง)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -55,8 +99,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # React frontend
+    "https://se-project-beta-frontend.vercel.app",
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True  # หรือจะระบุ URL ที่อนุญาตให้เชื่อมต่อจาก React โดยเฉพาะ
 
 ROOT_URLCONF = 'bookhub.urls'
 
@@ -84,16 +130,24 @@ WSGI_APPLICATION = 'bookhub.wsgi.application'
 
 
 import os
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME', 'bookhub_db'),
-        'USER': os.getenv('DATABASE_USER', 'user'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
-        'HOST': os.getenv('DATABASE_HOST', 'db'),  # ✅ ต้องใช้ชื่อ `db` ตาม Docker Compose
-        'PORT': os.getenv('DATABASE_PORT', '5432'),
+        'NAME': 'postgres',
+        'USER': 'postgres.jesymqwwoxinovuxsibt',
+        'PASSWORD': 'ojs25472004*',
+        'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',
+        'PORT': '6543',
     }
 }
+
+
+
 
 
 
@@ -138,3 +192,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+
+

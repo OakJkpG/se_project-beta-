@@ -1,0 +1,49 @@
+/* src/pages/Auth.css */
+.auth-page {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .auth-page h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .auth-page form div {
+    margin-bottom: 1rem;
+  }
+  
+  .auth-page label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .auth-page input {
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+  
+  .auth-page button {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .auth-page .error {
+    color: red;
+    text-align: center;
+  }
+  
+  .auth-page .message {
+    color: green;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  

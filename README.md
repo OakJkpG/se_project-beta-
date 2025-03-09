@@ -1,46 +1,64 @@
 Backend: Django + Django REST Framework
 ใช้ Django REST Framework สร้าง REST API
 รองรับ CORS ให้เชื่อมต่อกับ Frontend
-ใช้ PostgreSQL หรือ SQLite เป็น Database
 
-Frontend: React + Vite
+Frontend: React + Vite(vercel)
 ใช้ React Router จัดการหน้าเว็บ
 ใช้ Axios เรียก API จาก Backend
-ออกแบบ Component-based
 
-Database: PostgreSQL
-รองรับการจัดการข้อมูลหลายตาราง เช่น ผู้ใช้ & หนังสือ
+Database: PostgreSQL(supabase + render + corn-job)
 ใช้ Django ORM จัดการ Database
 
 BookHub/
-│── backend/             
-│   ├── bookhub/         
-│   ├── books/           
+│── backend/    
+│   ├── admin_dashboard/    
+│   │   └── templates/admin_dashboard    
+│   ├── bookhub/ 
+│   │   │   └── settings.py    
+│   ├── books/  
+│   │   └── views.py      
 │   ├── users/
 │   ├── venv/                  
 │   ├── manage.py        
 │   ├── requirements.txt 
 │   ├── .env             
-│   ├── Dockerfile       
+│   ├── Dockerfile      
+│   ├── .gitignore   
 │   └── Procfile          
 │
-│── frontend/
-│   ├── dir/  
+│── frontend/            
 │   ├── src/             
 │   │   ├── pages/       
+│   │   │   ├── Account.css
+│   │   │   ├── AccountPublisher.jsx 
+│   │   │   ├── AccountReader.jsx 
+│   │   │   ├── Auth.css
+│   │   │   ├── BooksDetails.jsx
 │   │   │   ├── Home.jsx 
-│   │   │   ├── Books.jsx
-│   │   ├── api.js       
+│   │   │   ├── Home.css
+│   │   │   ├── Login.jsx
+│   │   │   ├── MainPage.jsx 
+│   │   │   ├── MainPage.css
+│   │   │   ├── ReadBookWaarpper.jsx
+│   │   │   ├── ReadBook.jsx 
+│   │   │   ├── SignupPublisher.jsx
+│   │   │   └── SignupReader.jsx 
+│   │   ├── api.js 
+│   │   ├── App.css      
 │   │   ├── App.jsx      
 │   │   ├── main.jsx     
 │   │   ├── index.css    
 │   ├── public/
+│   ├── dist/
 │   ├── node_modules/
 │   ├── .gitignore
+│   ├── Dockerfile
 │   ├── eslint.config.js       
-│   ├── index.html     
+│   ├── index.html   
+│   ├── package-lock.json     
 │   ├── package.json            
-│   └── vite.config.js   
-│── README.md 
-│── docker-compose.yml            
+│   ├── vite.config.js   
+│   └── yarn.lock
+│── README.md     
+│── docker-compose.yml       
 └── .gitignore           

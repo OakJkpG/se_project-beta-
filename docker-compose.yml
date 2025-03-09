@@ -9,31 +9,20 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgres://user:password@db:5432/bookhub_db
-    depends_on:
-      db:
+      - DEBUG=True
+      - DATABASE_URL=postgresql://postgres.jesymqwwoxinovuxsibt:ojs25472004*@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+  # ใช้ URL ของ Supabase
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
-    command: sh -c "yarn install && yarn dev"
+#   frontend:
+#     build:
+#       context: ./frontend
+#     ports:
+#       - "5173:5173"
+#     volumes:
+#       - ./frontend:/usr/src/app
+#       - node_modules:/usr/src/app/node_modules
+#     command: sh -c "yarn install --frozen-lockfile && yarn dev"
 
-  db:
-    image: postgres:13
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: bookhub_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-
-
-volumes:
-  postgres_data:
+# volumes:
+#   node_modules:
