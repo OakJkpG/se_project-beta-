@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils import timezone
+from .storages import PublicMediaStorage, PrivateMediaStorage
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -15,18 +16,19 @@ class Book(models.Model):
     )
     title = models.CharField(max_length=200)
     description = models.TextField()
-    cover_image = models.ImageField(upload_to='covers/')
-    pdf_file = models.FileField(upload_to='pdfs/', blank=True, null=True)
+    cover_image = models.URLField(max_length=200, blank=True, null=True)  # เพิ่ม field นี้
+    pdf_file = models.FileField(storage=PrivateMediaStorage(), upload_to='', blank=True, null=True)
     lending_period = models.PositiveIntegerField(default=14)  # จำนวนวันให้ยืม
     max_borrowers = models.PositiveIntegerField(default=1)    # จำนวนคนที่สามารถยืมได้พร้อมกัน
     tags = models.ManyToManyField('Tag', through='BookTag', blank=True)
-    borrow_count = models.PositiveIntegerField(default=0)      # สำหรับสถิติการยืม (ไม่ใช่จำนวนผู้ยืมปัจจุบัน)
+    borrow_count = models.PositiveIntegerField(default=0)      # สำหรับสถิติการยืม
 
     def remaining_borrows(self):
-        # นับจำนวน BookBorrow ที่ยังมีอยู่ (ยังไม่คืน)
-        current_borrows = self.borrows.count()
-        remaining = self.max_borrowers - current_borrows
-        return remaining
+        return self.max_borrowers - self.borrows.filter(returned_at__isnull=True).count()
+
+    @property
+    def is_available(self):
+        return self.remaining_borrows() > 0
 
     def __str__(self):
         return self.title
@@ -47,7 +49,12 @@ class BookBorrow(models.Model):
     )
     borrow_date = models.DateTimeField(auto_now_add=True)
     due_date = models.DateTimeField()
+    returned_at = models.DateTimeField(null=True, blank=True) # เพิ่ม field returned_at
 
+    @property
+    def is_returned(self):
+        return self.returned_at is not None
+    
     def save(self, *args, **kwargs):
         if not self.pk:
             self.due_date = timezone.now() + timedelta(days=self.book.lending_period)

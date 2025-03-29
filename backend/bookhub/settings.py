@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ต้องอยู่ด้านบน
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,6 +66,18 @@ MIDDLEWARE = [
 # อนุญาตให้ทุก origin เชื่อมต่อ (สำหรับพัฒนา)
 CORS_ALLOW_ALL_ORIGINS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://se-project-beta-backend.onrender.com",
+    "https://se-project-beta-frontend-git-master-oakjkpgs-projects.vercel.app",
+    "https://se-project-beta-frontend.vercel.app",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://se-project-beta-frontend.vercel.app",
+    "http://localhost:8000",
+]
+
+CORS_ORIGIN_ALLOW_ALL = True  # หรือจะระบุ URL ที่อนุญาตให้เชื่อมต่อจาก React โดยเฉพาะ
 # ตั้งค่า Email (สำหรับ demo ส่งไปที่ console)
 # ตั้งค่า Email Backend (ใช้ SMTP)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -85,24 +97,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
-
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "https://se-project-beta-frontend.vercel.app",
-]
-
-CORS_ORIGIN_ALLOW_ALL = True  # หรือจะระบุ URL ที่อนุญาตให้เชื่อมต่อจาก React โดยเฉพาะ
 
 ROOT_URLCONF = 'bookhub.urls'
 
@@ -128,29 +122,52 @@ WSGI_APPLICATION = 'bookhub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-
+#database
 import os
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres.jesymqwwoxinovuxsibt',
-        'PASSWORD': 'ojs25472004*',
+        'USER': 'postgres.csqtsflaklabqsnjlioy',
+        'PASSWORD': 'bookhubgroup10',
         'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',
         'PORT': '6543',
     }
 }
 
+# ด้านบนไฟล์ settings.py
+import os
+import environ
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+# ...
 
+# เพิ่มการตั้งค่า Storage ของ S3 (สำหรับ Supabase)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = 'd4f5b4d6ea21398b564a724e48e84a6e'
+AWS_SECRET_ACCESS_KEY = '11315d5a3fde55fbfd230bae63125d2bc802bdc5f5dd0f559786d3e23326aa9a'
+AWS_STORAGE_BUCKET_NAME = 'Bookhub_media'  # Default bucket name
+AWS_STORAGE_BUCKET_NAME_MEDIA = 'Bookhub_media'
+AWS_STORAGE_BUCKET_NAME_PDF = 'Bookhub_pdf'
+AWS_S3_ENDPOINT_URL = 'https://csqtsflaklabqsnjlioy.supabase.co/storage/v1/s3'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_S3_REGION_NAME = 'ap-southeast-1'  # เพิ่ม Region
 
+SUPABASE_URL='https://csqtsflaklabqsnjlioy.supabase.co'
+SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcXRzZmxha2xhYnFzbmpsaW95Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTU0NjExMywiZXhwIjoyMDU3MTIyMTEzfQ.5ShmiI7t-b8LTxKeh3TxE0RILSdG5Ss6a1WrkaxqaAI'
+        
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -176,7 +193,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'  # ตั้งค่า Timezone ให้ถูกต้อง
 
 USE_I18N = True
 
@@ -186,12 +203,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'books': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 
 
 

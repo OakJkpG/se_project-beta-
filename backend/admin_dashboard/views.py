@@ -23,7 +23,6 @@ class AdminLoginView(LoginView):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    # เพิ่มการดึงข้อมูลต่างๆ เช่น users, books และ publishers
     all_users = User.objects.all()
     all_books = Book.objects.all()
     pending_publishers = User.objects.filter(profile__user_type='publisher', is_active=False)
@@ -43,7 +42,6 @@ def approve_publisher(request, user_id):
     publisher = get_object_or_404(User, id=user_id, profile__user_type='publisher', is_active=False)
     publisher.is_active = True
     publisher.save()
-    # ส่ง email แจ้งว่าได้รับการอนุมัติ
     send_mail(
          'Publisher Registration Approved',
          'Your publisher registration has been approved by admin.',
@@ -60,7 +58,6 @@ def approve_publisher(request, user_id):
 def reject_publisher(request, user_id):
     publisher = get_object_or_404(User, id=user_id, profile__user_type='publisher', is_active=False)
     publisher_email = publisher.email
-    # ในที่นี้เราเลือกที่จะลบ account publisher หากปฏิเสธ
     publisher.delete()
     send_mail(
          'Publisher Registration Rejected',
@@ -72,10 +69,30 @@ def reject_publisher(request, user_id):
     messages.success(request, f"Publisher {publisher_email} rejected and removed.")
     return redirect('admin_dashboard')
 
+# View สำหรับลบผู้ใช้
+@login_required
+@user_passes_test(is_admin)
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user_email = user.email
+    user.delete()
+    messages.success(request, f"User {user_email} deleted.")
+    return redirect('admin_dashboard')
+
+# View สำหรับลบหนังสือ
+@login_required
+@user_passes_test(is_admin)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book_title = book.title
+    book.delete()
+    messages.success(request, f"Book {book_title} deleted.")
+    return redirect('admin_dashboard')
+
 # Custom logout view
 @login_required
 def custom_logout(request):
     auth_logout(request)
-    response = redirect('admin_login')  # Redirect ไปที่หน้า login
-    response.delete_cookie('sessionid')  # ลบ cookie ของ session
+    response = redirect('admin_login')
+    response.delete_cookie('sessionid')
     return response

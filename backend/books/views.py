@@ -8,32 +8,44 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 from django.http import FileResponse
-from .models import BookBorrow
 from django.http import HttpResponse
+from .models import Tag
+from .serializers import TagSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.conf import settings
+from .storages import PrivateMediaStorage
+from supabase import create_client
+import logging
+
+logger = logging.getLogger(__name__)
+
+# สร้าง Supabase Client
+supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 def home(request):
     return HttpResponse("Welcome to Books API!")
 
-# สำหรับหน้า Main: แสดงรายการหนังสือทั้งหมด
+class TagListView(generics.ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# แสดงรายละเอียดหนังสือ (รวมเวลายืมได้)
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
-# Reader ยืมหนังสือ
 class BorrowBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         user = request.user
-        if user.profile.user_type != 'reader':
+        if hasattr(user, 'profile') and user.profile.user_type != 'reader':
             return Response({"error": "Only readers can borrow books."},
                             status=status.HTTP_403_FORBIDDEN)
         book_id = request.data.get('book_id')
@@ -41,45 +53,54 @@ class BorrowBookView(APIView):
         if not book.is_available:
             return Response({"error": "Book is not available."},
                             status=status.HTTP_400_BAD_REQUEST)
-        # เปลี่ยนสถานะหนังสือและเพิ่ม borrow_count
-        book.is_available = False
+        borrow = BookBorrow.objects.create(reader=request.user, book=book)
         book.borrow_count += 1
         book.save()
-        borrow_entry = BookBorrow.objects.create(book=book, reader=user)
-        serializer = BookBorrowSerializer(borrow_entry)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Book borrowed successfully!', 'borrow_id': borrow.id},
+                        status=status.HTTP_201_CREATED)
 
-# Reader คืนหนังสือ
 class ReturnBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, borrow_id):
-        user = request.user
-        borrow_entry = get_object_or_404(BookBorrow, id=borrow_id, reader=user)
-        book = borrow_entry.book
-        book.is_available = True
-        book.save()
-        borrow_entry.delete()
-        return Response({"message": "Book returned successfully."},
-                        status=status.HTTP_200_OK)
+        try:
+            # Fetch the borrow record
+            borrow = BookBorrow.objects.select_related('book').get(
+                id=borrow_id,
+                reader=request.user,
+                returned_at__isnull=True  # Ensure the book hasn't already been returned
+            )
 
-# Publisher เพิ่มหนังสือ
-class AddBookView(APIView):
+            # Mark the book as returned
+            borrow.returned_at = timezone.now()
+            borrow.save()
+
+            # Update the book's borrow count
+            book = borrow.book
+            if book.borrow_count > 0:
+                book.borrow_count -= 1
+                book.save()
+
+            return Response({
+                'status': 'success',
+                'message': 'Book returned successfully'
+            }, status=status.HTTP_200_OK)
+
+        except BookBorrow.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Borrow record not found or already returned'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+class AddBookView(generics.CreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
-    def post(self, request):
-        user = request.user
-        if user.profile.user_type != 'publisher':
-            return Response({"error": "Only publishers can add books."},
-                            status=status.HTTP_403_FORBIDDEN)
-        # เพิ่ม publisher เข้า validated_data โดยอัตโนมัติ
-        serializer = BookSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(publisher=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(publisher=self.request.user)
 
-# Publisher ลบหนังสือ (เฉพาะหนังสือของตัวเอง)
 class RemoveBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -90,32 +111,28 @@ class RemoveBookView(APIView):
         return Response({"message": "Book removed successfully."},
                         status=status.HTTP_200_OK)
 
-# ข้อมูล account สำหรับ Reader
 class ReaderAccountView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        if user.profile.user_type != 'reader':
+        if hasattr(user, 'profile') and user.profile.user_type != 'reader':
             return Response({"error": "Not authorized."},
                             status=status.HTTP_403_FORBIDDEN)
         borrowed = BookBorrow.objects.filter(reader=user)
-        from .serializers import BookBorrowSerializer  # ใช้ serializer ที่สร้างไว้
         borrow_serializer = BookBorrowSerializer(borrowed, many=True)
         data = {
             "user": {
-                "name": user.first_name,
+                "name": user.username,
                 "email": user.email,
                 "role": user.profile.user_type,
                 "registered_at": user.date_joined,
                 "borrow_count": borrowed.count(),
-                "profile_image": "",  # เพิ่ม field รูปโปรไฟล์หากมี
             },
             "borrowed_books": borrow_serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
 
-# ข้อมูล account สำหรับ Publisher
 class PublisherAccountView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -143,19 +160,62 @@ class ReadBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, borrow_id):
-        # ดึง borrow entry สำหรับผู้ใช้ที่ล็อกอินอยู่
-        borrow_entry = get_object_or_404(BookBorrow, id=borrow_id, reader=request.user)
-        now = timezone.now()
-        if now > borrow_entry.due_date:
-            # หากหมดเวลา ให้ลบ entry และแจ้งให้ทราบว่าไม่สามารถเข้าถึงได้อีก
-            borrow_entry.delete()
-            return Response({"error": "Borrow period expired. This book is no longer accessible."},
-                            status=status.HTTP_403_FORBIDDEN)
-        book = borrow_entry.book
-        if not book.pdf_file:
-            return Response({"error": "PDF not available."},
-                            status=status.HTTP_404_NOT_FOUND)
-        # ส่งไฟล์ PDF เป็น inline content (ไม่ให้ดาวน์โหลดโดยตรง)
-        response = FileResponse(book.pdf_file.open('rb'), content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="{}"'.format(book.pdf_file.name)
-        return response
+        try:
+            # ตรวจสอบว่าการยืมนี้เป็นของผู้ใช้ที่ล็อกอินอยู่
+            borrow_entry = get_object_or_404(BookBorrow, id=borrow_id, reader=request.user)
+
+            # ตรวจสอบว่าเวลายืมหมดอายุหรือไม่
+            if borrow_entry.due_date < timezone.now():
+                return Response({"error": "Borrowing period has expired."}, status=status.HTTP_403_FORBIDDEN)
+
+            # ตรวจสอบว่าหนังสือมีไฟล์ PDF หรือไม่
+            book = borrow_entry.book
+            if not book.pdf_file:
+                return Response({"error": "PDF file not found for this book."}, status=status.HTTP_404_NOT_FOUND)
+
+            # สร้าง Signed URL สำหรับไฟล์ PDF
+            file_name = book.pdf_file.name
+            file_path = f"pdfs/{file_name}" if not file_name.startswith('pdfs/') else file_name
+
+            response = supabase.storage.from_("Bookhub_pdf").create_signed_url(
+                path=file_path,
+                expires_in=3600  # URL valid for 1 hour
+            )
+
+            if not response or not response.get("signedURL"):
+                return Response({"error": "Failed to generate signed URL."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response({"signed_url": response["signedURL"]}, status=status.HTTP_200_OK)
+
+        except BookBorrow.DoesNotExist:
+            return Response({"error": "Borrow record not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            # จัดการข้อผิดพลาดทั่วไป
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EditBookView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, book_id):
+        try:
+            # Get book and verify ownership
+            book = Book.objects.get(id=book_id, publisher=request.user)
+            
+            # Update book with partial data
+            serializer = BookSerializer(
+                book,
+                data=request.data,
+                partial=True  # Allow partial updates
+            )
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Book.DoesNotExist:
+            return Response(
+                {"detail": "Book not found or you don't have permission to edit it"},
+                status=status.HTTP_404_NOT_FOUND
+            )

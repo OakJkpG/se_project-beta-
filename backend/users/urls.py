@@ -5,6 +5,7 @@ from .views import (
     SignupReaderView,
     ReaderVerificationView,
     SignupPublisherView,
+    GoogleLoginView,
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path('signup/reader/', SignupReaderView.as_view(), name='signup_reader'),
     path('signup/reader/verify/', ReaderVerificationView.as_view(), name='signup_reader_verify'),
     path('signup/publisher/', SignupPublisherView.as_view(), name='signup_publisher'),
+    path('google-login/', GoogleLoginView.as_view(), name='google_login'),
 ]

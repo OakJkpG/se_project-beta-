@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Sign-In for Readers</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    #result { 
+      margin-top: 20px; 
+      padding: 15px; 
+      background: #f5f5f5; 
+      border-radius: 4px;
+      word-break: break-all;
+    }
+    .reader-note {
+      background-color: #e8f4ff;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>BookHub Reader Sign-In</h1>
+  
+  <div class="reader-note">
+    <strong>Note:</strong> Sign in with Google is available for readers only. Publishers need to register using the standard signup form.
+  </div>
+  
+  <div id="g_id_onload"
+       data-client_id="922387380789-081ufgcic0l05iivp0lnqqu694cs6sbl.apps.googleusercontent.com"
+       data-context="signin"
+       data-callback="handleCredentialResponse">
+  </div>
+  
+  <div class="g_id_signin"
+       data-type="standard"
+       data-size="large"
+       data-theme="filled_blue"
+       data-text="sign_in_with"
+       data-shape="rectangular"
+       data-logo_alignment="left">
+  </div>
+  
+  <div id="result"></div>
+  
+  <script>
+    function handleCredentialResponse(response) {
+      document.getElementById('result').textContent = 
+        'Got credential! Token: ' + response.credential.substring(0, 20) + '...';
+      
+      // You can log the full token for debugging
+      console.log('Google token:', response.credential);
+      
+      // You can test sending to your backend
+      fetch('http://127.0.0.1:8000/api/google-login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: response.credential,
+          user_type: 'reader' // Explicitly set user_type to reader
+        })
+      })
+      .then(response => {
+        // Check if response is OK
+        if (!response.ok) {
+          throw new Error('HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('result').innerHTML += '<br><br>Login successful!<br>User type: ' + data.role + 
+          '<br>Name: ' + data.name + 
+          '<br>Token: ' + data.token.substring(0, 10) + '...';
+          
+        // Store token in localStorage for testing
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('userId', data.userId);
+        
+        // Add a redirect button
+        const redirectBtn = document.createElement('button');
+        redirectBtn.textContent = 'Go to Reader Dashboard';
+        redirectBtn.style = 'margin-top: 15px; padding: 8px 16px; background-color: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        redirectBtn.onclick = () => {
+          window.location.href = `/account/reader/${data.userId}`;
+        };
+        document.getElementById('result').appendChild(redirectBtn);
+      })
+      .catch(error => {
+        document.getElementById('result').innerHTML += '<br><br>Error: ' + error;
+      });
+    }
+  </script>
+</body>
+</html>

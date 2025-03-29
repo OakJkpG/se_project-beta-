@@ -16,7 +16,8 @@ BookHub/
 │   ├── bookhub/ 
 │   │   │   └── settings.py    
 │   ├── books/  
-│   │   └── views.py      
+│   │   └── views.py   
+│   │   └── storages.py   
 │   ├── users/
 │   ├── venv/                  
 │   ├── manage.py        
@@ -62,3 +63,7 @@ BookHub/
 │── README.md     
 │── docker-compose.yml       
 └── .gitignore           
+
+#if frontend have a problem
+npm install 
+npm run dev

@@ -14,15 +14,15 @@ services:
   # ใช้ URL ของ Supabase
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
-#   frontend:
-#     build:
-#       context: ./frontend
-#     ports:
-#       - "5173:5173"
-#     volumes:
-#       - ./frontend:/usr/src/app
-#       - node_modules:/usr/src/app/node_modules
-#     command: sh -c "yarn install --frozen-lockfile && yarn dev"
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    command: sh -c "yarn install --frozen-lockfile && yarn dev"
 
-# volumes:
-#   node_modules:
+volumes:
+  node_modules:

@@ -1,0 +1,259 @@
+.book-detail-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px;
+  background-color: #222;
+  min-height: 100vh;
+  color: #f5f5f5;
+  position: relative;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out forwards;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.notification.success {
+  background-color: #388e3c;
+  color: white;
+}
+
+.notification.error {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.book-detail-container {
+  display: flex;
+  max-width: 1200px;
+  gap: 40px;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.book-image {
+  flex-shrink: 0;
+}
+
+.book-image img {
+  width: 300px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.book-info {
+  flex-grow: 1;
+}
+
+.book-info h1 {
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.book-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.tag-pill {
+  background-color: #1976d2;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+}
+
+.no-tags {
+  color: #aaa;
+  font-style: italic;
+}
+
+.publisher {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #bbb;
+}
+
+.book-description {
+  margin-bottom: 25px;
+}
+
+.book-description h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #eee;
+}
+
+.book-description p {
+  line-height: 1.6;
+  color: #ccc;
+}
+
+.book-details {
+  background-color: #444;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #555;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #ddd;
+}
+
+.detail-value {
+  font-weight: 500;
+}
+
+.detail-value.available {
+  color: #4caf50;
+}
+
+.detail-value.unavailable {
+  color: #f44336;
+}
+
+.book-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.borrow-button, .edit-button, .remove-button, .back-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.borrow-button {
+  background-color: #2e7d32;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.borrow-button:hover:not(:disabled) {
+  background-color: #1b5e20;
+}
+
+.borrow-button.loading {
+  background-color: #1b5e20;
+  cursor: wait;
+}
+
+.borrow-button.disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.button-loader {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.edit-button {
+  background-color: #1976d2;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #1565c0;
+}
+
+.remove-button {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.remove-button:hover {
+  background-color: #b71c1c;
+}
+
+.back-button {
+  background-color: #424242;
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #323232;
+}
+
+.publisher-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: #f5f5f5;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .book-detail-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .book-image img {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+  }
+}

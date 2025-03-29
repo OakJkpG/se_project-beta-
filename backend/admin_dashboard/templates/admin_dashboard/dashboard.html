@@ -87,6 +87,7 @@
               <th>Name</th>
               <th>Role</th>
               <th>Active</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -94,9 +95,12 @@
               <tr>
                 <td>{{ user.id }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.first_name }}</td>
+                <td>{{ user.username }}</td>
                 <td>{{ user.profile.user_type }}</td>
                 <td>{{ user.is_active }}</td>
+                <td>
+                  <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
@@ -115,6 +119,7 @@
               <th>Title</th>
               <th>Publisher</th>
               <th>Borrow Count</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -124,6 +129,9 @@
                 <td>{{ book.title }}</td>
                 <td>{{ book.publisher.first_name }}</td>
                 <td>{{ book.borrow_count }}</td>
+                <td>
+                  <a href="{% url 'delete_book' book.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
