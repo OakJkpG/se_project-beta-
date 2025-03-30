@@ -9,15 +9,13 @@ class TagSerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
     tags = serializers.SlugRelatedField(
-        many=True, slug_field='name', queryset=Tag.objects.all()
+        many=True, slug_field='name', queryset=Tag.objects.all(), required=False
     )
-    remaining_borrows = serializers.SerializerMethodField()
+    selectedTags = serializers.CharField(write_only=True, required=False)
     custom_tag = serializers.CharField(write_only=True, required=False)
-    selectedTags = serializers.ListField(
-        child=serializers.CharField(), write_only=True, required=False
-    )
     publisher_name = serializers.SerializerMethodField()
-    cover_image = serializers.URLField(max_length=200, min_length=None, allow_blank=False)  # เพิ่ม field นี้
+    cover_image = serializers.URLField(max_length=200, min_length=None, allow_blank=False)
+    remaining_borrows = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -28,6 +26,25 @@ class BookSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['publisher', 'borrow_count']
 
+    def validate(self, data):
+        """
+        ตรวจสอบว่าใช้แค่ selectedTags หรือ custom_tag อย่างใดอย่างหนึ่ง
+        """
+        selected_tags = data.get('selectedTags')
+        custom_tag = data.get('custom_tag')
+
+        if selected_tags and custom_tag:
+            raise serializers.ValidationError(
+                "Please choose either an existing tag or create a new tag, not both"
+            )
+        
+        if not selected_tags and not custom_tag:
+            raise serializers.ValidationError(
+                "Please provide either an existing tag or create a new tag"
+            )
+
+        return data
+
     def get_remaining_borrows(self, obj):
         return obj.remaining_borrows()
 
@@ -35,27 +52,47 @@ class BookSerializer(serializers.ModelSerializer):
         return obj.publisher.first_name
 
     def create(self, validated_data):
-        validated_data.pop('tags', None)
+        # แยก tags และ custom_tag ออกจาก validated_data
+        tags_data = validated_data.pop('tags', [])
         custom_tag = validated_data.pop('custom_tag', None)
-        selected_tags = validated_data.pop('selectedTags', [])
+        selected_tag = validated_data.pop('selectedTags', None)
+
+        # สร้าง book
         book = Book.objects.create(**validated_data)
-        for tag_name in selected_tags:
-            try:
-                tag_obj = Tag.objects.get(name=tag_name)
-                book.tags.add(tag_obj)
-            except Tag.DoesNotExist:
-                pass
-        if custom_tag:
-            tag_obj, created = Tag.objects.get_or_create(name=custom_tag)
-            book.tags.add(tag_obj)
+
+        try:
+            # จัดการ selected tag (เลือกจากระบบ)
+            if selected_tag:
+                # ทำความสะอาดข้อมูล selected tag
+                clean_tag = selected_tag.strip('[]"\' ')
+                if clean_tag:
+                    tag_obj = Tag.objects.get(name=clean_tag)
+                    book.tags.add(tag_obj)
+
+            # จัดการ custom tag (สร้างใหม่)
+            elif custom_tag:
+                # ทำความสะอาดข้อมูล custom tag
+                clean_tag = custom_tag.strip()
+                if clean_tag:
+                    tag_obj, created = Tag.objects.get_or_create(
+                        name=clean_tag
+                    )
+                    book.tags.add(tag_obj)
+
+        except Exception as e:
+            # ลบ book ถ้าเกิดข้อผิดพลาดในการจัดการ tag
+            book.delete()
+            raise serializers.ValidationError(f"Error handling tags: {str(e)}")
+
         return book
 
 class BookBorrowSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
-    book_id = serializers.PrimaryKeyRelatedField(
-        queryset=Book.objects.all(), source='book', write_only=True
-    )
+    countdown = serializers.SerializerMethodField()
 
     class Meta:
         model = BookBorrow
-        fields = ['id', 'book', 'book_id', 'borrow_date', 'due_date', 'returned_at'] # เพิ่ม returned_at
+        fields = ['id', 'book', 'book_id', 'borrow_date', 'due_date', 'returned_at', 'countdown']
+
+    def get_countdown(self, obj):
+        return obj.get_countdown()

@@ -28,13 +28,13 @@ const SignupPublisher = () => {
       navigate('/login');
     } catch (err) {
       console.error(err);
-      setError('Signup failed. Please try again.');
+      setError('Sign up failed. Please try again.');
     }
   };
 
   return (
     <div className="auth-page">
-      <h2>Signup as Publisher</h2>
+      <h2>Sign up as Publisher</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
@@ -57,7 +57,7 @@ const SignupPublisher = () => {
           <label>ID Card:</label>
           <input type="text" value={idCard} onChange={(e) => setIdCard(e.target.value)} required />
         </div>
-        <button type="submit">Signup</button>
+        <button type="submit">Sign up</button>
       </form>
       {message && <p className="message">{message}</p>}
     </div>

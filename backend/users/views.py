@@ -106,45 +106,31 @@ class GoogleLoginView(APIView):
             name = idinfo.get('name', '')
             
             # Check if user exists
-            try:
-                user = User.objects.get(email=gmail)
-                
-                # Get or create profile
-                profile, created = Profile.objects.get_or_create(
-                    user=user,
-                    defaults={'user_type': 'reader'}
-                )
-                
-            except User.DoesNotExist:
-                # Create new user
-                username = gmail.split('@')[0]
-                # Ensure username is unique
-                if User.objects.filter(username=username).exists():
-                    username = f"{username}{User.objects.count()}"
-                    
-                user = User.objects.create_user(
-                    username=username,
-                    email=gmail,
-                    first_name=name.split(' ')[0] if ' ' in name else name,
-                    last_name=name.split(' ')[-1] if ' ' in name else ''
-                )
-                
-                # Create profile for new user
-                profile = Profile.objects.create(
-                    user=user,
-                    user_type='reader'
-                )
+            user, created = User.objects.get_or_create(
+                email=gmail,
+                defaults={
+                    'username': gmail.split('@')[0],
+                    'first_name': name.split(' ')[0] if ' ' in name else name,
+                    'last_name': name.split(' ')[-1] if ' ' in name else '',
+                }
+            )
+            
+            # Ensure username is unique if user was just created
+            if created and User.objects.filter(username=user.username).exists():
+                user.username = f"{user.username}{User.objects.count()}"
+                user.save()
+            
+            # Get or create profile
+            profile, _ = Profile.objects.get_or_create(
+                user=user,
+                defaults={'user_type': 'reader'}
+            )
             
             # Get token
             token, _ = Token.objects.get_or_create(user=user)
             
             # Always use reader role for Google login
             role = 'reader'
-            
-            # Update profile type if needed
-            if profile.user_type != 'reader':
-                profile.user_type = 'reader'
-                profile.save()
             
             return Response({
                 'token': token.key,

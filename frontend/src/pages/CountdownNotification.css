@@ -1,0 +1,39 @@
+.countdown-notification {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  margin-top: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.countdown-notification.urgent {
+  background: rgba(255, 107, 0, 0.2);
+  color: #ff6b00;
+  animation: pulse 2s infinite;
+}
+
+.countdown-notification.overdue {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.countdown-notification svg {
+  font-size: 1.1rem;
+}

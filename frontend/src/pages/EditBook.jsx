@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaTag, FaUpload, FaTimes, FaBook } from 'react-icons/fa';
 import { uploadImage, uploadPDF } from '../api';
 import './EditBook.css';
 
@@ -19,7 +19,7 @@ const EditBook = () => {
     description: '',
     lending_period: 14,
     max_borrowers: 1,
-    cover_image: '',
+    cover_image: null,
     pdf_file: null,
     selectedTags: [],
   });
@@ -41,7 +41,7 @@ const EditBook = () => {
         setLoading(false);
       } catch (err) {
         console.error('Error:', err);
-        setError('Failed to load book data');
+        setError('ไม่สามารถโหลดข้อมูลหนังสือได้');
         setLoading(false);
       }
     };
@@ -62,14 +62,29 @@ const EditBook = () => {
   };
 
   const handleTagSelection = (tagName) => {
-    setBookData(prev => ({
-      ...prev,
-      selectedTags: prev.selectedTags.includes(tagName)
-        ? prev.selectedTags.filter(tag => tag !== tagName)
-        : [...prev.selectedTags, tagName]
-    }));
+    setBookData(prev => {
+      const currentTags = prev.selectedTags || [];
+      
+      if (currentTags.includes(tagName)) {
+        return {
+          ...prev,
+          selectedTags: currentTags.filter(t => t !== tagName)
+        };
+      }
+      
+      if (currentTags.length >= 3) {
+        alert('สามารถเลือกได้สูงสุด 3 แท็ก');
+        return prev;
+      }
+
+      return {
+        ...prev,
+        selectedTags: [...currentTags, tagName]
+      };
+    });
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleRemoveTag = (tagName) => {
     setBookData(prev => ({
       ...prev,
@@ -82,34 +97,36 @@ const EditBook = () => {
     setLoading(true);
     
     try {
-      let coverImageUrl = bookData.cover_image;
-      let pdfFileUrl = bookData.pdf_file;
-
+      const formData = new FormData();
+      
+      formData.append('title', bookData.title.trim());
+      formData.append('description', bookData.description.trim());
+      formData.append('lending_period', parseInt(bookData.lending_period));
+      formData.append('max_borrowers', parseInt(bookData.max_borrowers));
+      
+      formData.append('tags', JSON.stringify(bookData.selectedTags));
+      
       if (bookData.new_cover_image instanceof File) {
-        coverImageUrl = await uploadImage(bookData.new_cover_image);
+        const coverImageUrl = await uploadImage(bookData.new_cover_image);
+        formData.append('cover_image', coverImageUrl);
+      } else if (bookData.cover_image) {
+        formData.append('cover_image', bookData.cover_image);
       }
-
+      
       if (bookData.new_pdf_file instanceof File) {
-        pdfFileUrl = await uploadPDF(bookData.new_pdf_file);
+        const pdfFileUrl = await uploadPDF(bookData.new_pdf_file);
+        formData.append('pdf_file', pdfFileUrl);
+      } else if (bookData.pdf_file) {
+        formData.append('keep_existing_pdf', 'true');
       }
-
-      const updateData = {
-        title: bookData.title.trim(),
-        description: bookData.description.trim(),
-        lending_period: parseInt(bookData.lending_period),
-        max_borrowers: parseInt(bookData.max_borrowers),
-        tags: bookData.selectedTags,
-        ...(coverImageUrl && { cover_image: coverImageUrl }),
-        ...(pdfFileUrl && { pdf_file: pdfFileUrl })
-      };
-
+      
       const response = await axios.put(
         `http://127.0.0.1:8000/api/books/update/${bookId}/`,
-        updateData,
+        formData,
         {
           headers: {
             'Authorization': `Token ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
           }
         }
       );
@@ -131,6 +148,43 @@ const EditBook = () => {
       setLoading(false);
     }
   };
+
+  const TagSelectionModal = () => (
+    <div className="modal tag-modal">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h3><FaTag /> เลือกแท็ก</h3>
+          <button 
+            className="close-button"
+            onClick={() => setShowTagModal(false)}
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <div className="tag-selection-info">
+          <p>เลือกได้สูงสุด 3 แท็ก (เลือกแล้ว {bookData.selectedTags.length}/3)</p>
+        </div>
+
+        <div className="tags-grid">
+          {availableTags.map((tag) => (
+            <label key={tag.id} className="tag-checkbox">
+              <input
+                type="checkbox"
+                checked={bookData.selectedTags.includes(tag.name)}
+                onChange={() => handleTagSelection(tag.name)}
+                disabled={
+                  !bookData.selectedTags.includes(tag.name) && 
+                  bookData.selectedTags.length >= 3
+                }
+              />
+              <span>{tag.name}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) return <div className="loading">กำลังโหลด...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -178,13 +232,46 @@ const EditBook = () => {
           />
         </div>
 
+        <div className="form-group tag-section">
+          <label>แท็ก:</label>
+          <button 
+            type="button" 
+            className="show-tags-button"
+            onClick={() => {
+              fetchAvailableTags();
+              setShowTagModal(true);
+            }}
+          >
+            <FaTag /> จัดการแท็ก
+          </button>
+
+          <div className="selected-tags">
+            {bookData.selectedTags.map((tag, index) => (
+              <span key={index} className="tag">
+                {tag}
+                <button 
+                  type="button" 
+                  onClick={() => handleTagSelection(tag)}
+                  className="remove-tag"
+                >
+                  <FaTimes />
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+
         <div className="form-group">
           <label>รูปปก:</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setBookData({...bookData, new_cover_image: e.target.files[0]})}
-          />
+          <div className="file-upload">
+            <FaUpload />
+            <p>คลิกเพื่อเลือกไฟล์รูปภาพ</p>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setBookData({...bookData, new_cover_image: e.target.files[0]})}
+            />
+          </div>
           {bookData.cover_image && (
             <img
               src={bookData.cover_image}
@@ -196,72 +283,21 @@ const EditBook = () => {
 
         <div className="form-group">
           <label>ไฟล์ PDF:</label>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={(e) => setBookData({...bookData, new_pdf_file: e.target.files[0]})}
-          />
+          <div className="file-upload">
+            <FaUpload />
+            <p>คลิกเพื่อเลือกไฟล์ PDF</p>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => setBookData({...bookData, new_pdf_file: e.target.files[0]})}
+            />
+          </div>
           {bookData.pdf_file && (
-            <p className="current-pdf">PDF ปัจจุบัน: มีอยู่แล้ว</p>
+            <div className="current-pdf">
+              <FaBook /> ไฟล์ PDF ปัจจุบัน
+            </div>
           )}
         </div>
-
-        <div className="form-group tag-section">
-          <label>แท็ก:</label>
-          <button 
-            type="button" 
-            className="show-tags-button"
-            onClick={() => {
-              fetchAvailableTags();
-              setShowTagModal(true);
-            }}
-          >
-            เลือกแท็ก
-          </button>
-
-          <div className="selected-tags">
-            {bookData.selectedTags.map((tag, index) => (
-              <span key={index} className="tag">
-                {tag}
-                <button 
-                  type="button" 
-                  onClick={() => handleRemoveTag(tag)}
-                  className="remove-tag"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {showTagModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <h3>เลือกแท็ก</h3>
-              <div className="tags-grid">
-                {availableTags.map((tag) => (
-                  <label key={tag.id} className="tag-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={bookData.selectedTags.includes(tag.name)}
-                      onChange={() => handleTagSelection(tag.name)}
-                    />
-                    {tag.name}
-                  </label>
-                ))}
-              </div>
-              <div className="modal-actions">
-                <button 
-                  type="button" 
-                  onClick={() => setShowTagModal(false)}
-                >
-                  ปิด
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="form-actions">
           <button type="submit" className="save-button">บันทึกการแก้ไข</button>
@@ -275,6 +311,7 @@ const EditBook = () => {
         </div>
       </form>
 
+      {showTagModal && <TagSelectionModal />}
       {showSuccessPopup && (
         <div className="success-popup">
           <div className="success-popup-content">

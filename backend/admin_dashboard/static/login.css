@@ -1,0 +1,181 @@
+:root {
+    --primary-color: #ff6b00;
+    --secondary-color: #444;
+    --text-color: #e0e0e0;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --input-border: #333;
+    --input-focus: #ff8533;
+    --input-bg: #2a2a2a;
+    --error-bg: #3a1010;
+    --error-color: #ff4d4d;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 220px;
+    background-color: var(--primary-color);
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.admin-login-page {
+    width: 100%;
+    max-width: 450px;
+    padding: 15px;
+}
+
+.login-container {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    width: 100px;
+    /* Adjust size as needed for your logo */
+    height: 100px;
+    /* Adjust size as needed for your logo */
+    background-color: transparent;
+    /* Remove the background color */
+    margin: 0 auto 20px;
+    box-shadow: none;
+    /* Remove shadow from container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    /* Add shadow to the image itself */
+}
+
+.login-title {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 24px;
+}
+
+.login-subtitle {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-control {
+    height: 50px;
+    border-radius: 8px;
+    padding-left: 45px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--input-focus);
+    background-color: #333;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    color: var(--primary-color);
+    font-size: 18px;
+}
+
+.login-btn {
+    background-color: var(--primary-color);
+    border: none;
+    height: 50px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(255, 107, 0, 0.2);
+    color: white;
+}
+
+.login-btn:hover {
+    background-color: var(--input-focus);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 107, 0, 0.3);
+}
+
+.alert {
+    border-radius: 8px;
+    padding: 15px;
+    border: none;
+    background-color: var(--error-bg);
+    color: var(--error-color);
+    border-left: 4px solid var(--error-color);
+    margin-bottom: 20px;
+}
+
+.alert i {
+    margin-right: 8px;
+}
+
+.footer-text {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin-top: 25px;
+}
+
+.bg-pattern {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(255, 107, 0, 0.1);
+    z-index: 0;
+    border-radius: 50% 0 0 0;
+}
+
+.form-control::placeholder {
+    color: #777;
+    font-size: 14px;
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+}

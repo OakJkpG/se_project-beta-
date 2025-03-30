@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import SignupModal from "../components/account/SignupModal";
 import "./Base.css";
 
 const Base = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
   // ดึงข้อมูลจาก localStorage
   const token = localStorage.getItem("token");
@@ -75,10 +77,12 @@ const Base = ({ children }) => {
                 <Link to="/login" className="nav-link">Login</Link>
               </motion.div>
               <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                <Link to="/signup/reader" className="nav-link">Signup as Reader</Link>
-              </motion.div>
-              <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                <Link to="/signup/publisher" className="nav-link">Signup as Publisher</Link>
+                <Link  
+                  onClick={() => setIsSignupModalOpen(true)} 
+                  className="nav-link signup-button"
+                >
+                  Sign Up
+                </Link>
               </motion.div>
             </>
           ) : (
@@ -97,6 +101,10 @@ const Base = ({ children }) => {
         </div>
       </motion.nav>
       <main className="p-4">{children}</main>
+      <SignupModal 
+        isOpen={isSignupModalOpen} 
+        onClose={() => setIsSignupModalOpen(false)} 
+      />
     </>
   );
 };

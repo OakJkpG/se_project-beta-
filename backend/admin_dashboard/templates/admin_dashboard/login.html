@@ -1,58 +1,68 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - BookHub</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-    }
-    .login-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 30px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .alert {
-      margin-bottom: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'login.css' %}">
 </head>
+
 <body>
+  <div class="admin-login-page">
+    <div class="login-container">
+      <div></div>
 
-  <div class="login-container">
-    <h2 class="text-center mb-4">Admin Login</h2>
+      <div class="login-header">
+        <div class="login-logo">
+          <img src="{% static 'bookhub.png' %}" alt="BookHub Logo">
+        </div>
+        <h1 class="login-title">BookHub Admin</h1>
+        <p class="login-subtitle">Sign in to manage the library platform</p>
+      </div>
 
-    {% if form.errors %}
-      <div class="alert alert-danger">
+      {% if form.errors %}
+      <div class="alert">
+        <i class="fas fa-exclamation-circle"></i>
         <strong>Invalid credentials, please try again.</strong>
       </div>
-    {% endif %}
+      {% endif %}
 
-    <form method="post">
-      {% csrf_token %}
-      
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" name="username" class="form-control" id="username" value="{{ form.username.value }}" required>
-      </div>
+      <form method="post">
+        {% csrf_token %}
 
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" id="password" value="{{ form.password.value }}" required>
-      </div>
+        <div class="form-group">
+          <span class="input-icon">
+            <i class="fas fa-user"></i>
+          </span>
+          <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username"
+            required>
+        </div>
 
-      <button type="submit" class="btn btn-primary w-100">Login</button>
-    </form>
+        <div class="form-group">
+          <span class="input-icon">
+            <i class="fas fa-lock"></i>
+          </span>
+          <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password"
+            required>
+        </div>
 
+        <button type="submit" class="btn login-btn w-100">
+          Sign In
+        </button>
+      </form>
+
+      <p class="footer-text">
+        © 2025 BookHub Admin Portal. All rights reserved.
+      </p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

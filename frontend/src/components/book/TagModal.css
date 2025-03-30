@@ -1,0 +1,185 @@
+.tag-modal .modal-content {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ff6b00;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #ff6b00;
+}
+
+.tag-selection-info {
+  padding: 1rem 1.5rem;
+  color: #888;
+  border-bottom: 1px solid #333;
+}
+
+.selected-tags-section {
+  padding: 1.5rem;
+  background: rgba(255, 107, 0, 0.1);
+  border-bottom: 1px solid #333;
+}
+
+.selected-tags-section h4 {
+  margin: 0 0 0.5rem 0;
+  color: #ff6b00;
+}
+
+.selected-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.selected-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ff6b00;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.remove-tag:hover {
+  opacity: 1;
+}
+
+.tags-list {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.tag-item {
+  width: 100%;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #242424;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-checkbox:hover:not(:has(input:disabled)) {
+  border-color: #ff6b00;
+  background: #2a2a2a;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + span {
+  color: #ff6b00;
+  font-weight: 500;
+}
+
+.tag-checkbox:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tag-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #242424;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.tag-button:not(:disabled):hover {
+  border-color: #ff6b00;
+  background: #2a2a2a;
+}
+
+.tag-button.selected {
+  background: #ff6b00;
+  border-color: #ff6b00;
+  color: white;
+}
+
+.tag-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-icon, .remove-icon {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.tag-button:hover .add-icon {
+  color: #ff6b00;
+  opacity: 1;
+}
+
+.tag-button.selected:hover .remove-icon {
+  opacity: 1;
+}
+
+.no-tags-message {
+  grid-column: 1/-1;
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}

@@ -28,3 +28,23 @@ def notify_due_date():
             [borrow.reader.email],
             fail_silently=False,
         )
+
+@shared_task
+def auto_return_overdue_books():
+    """
+    Task to automatically return overdue books
+    """
+    now = timezone.now()
+    overdue_borrows = BookBorrow.objects.filter(
+        returned_at__isnull=True,
+        due_date__lt=now
+    )
+    
+    for borrow in overdue_borrows:
+        borrow.returned_at = now
+        borrow.save()
+        
+        # Update book's borrow count
+        book = borrow.book
+        book.borrow_count = max(0, book.borrow_count - 1)
+        book.save()

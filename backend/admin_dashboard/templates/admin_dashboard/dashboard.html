@@ -1,69 +1,171 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - BookHub</title>
-  <!-- ใช้ Bootstrap เพื่อให้หน้าดูดีขึ้น -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-    }
-    .section {
-      margin-bottom: 3rem;
-    }
-    .table th, .table td {
-      text-align: center;
-      vertical-align: middle;
-    }
-    .container {
-      max-width: 1200px;
-      margin-top: 20px;
-    }
-    .table-container {
-      margin-top: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
-  <div class="container">
-    <h1 class="my-4">Admin Dashboard</h1>
-    <p>Welcome, {{ request.user.username }} | <a href="{% url 'admin_logout' %}">Logout</a></p>
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <img src="{% static 'bookhub.png' %}" alt="BookHub Logo">
+      </div>
+      <h3>BookHub</h3>
+    </div>
+    
+    <ul class="nav-links">
+      <li class="active">
+        <a href="{% url 'admin_dashboard' %}">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#users-section">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+      </li>
+      <li>
+        <a href="#books-section">
+          <i class="fas fa-book"></i>
+          <span>Books</span>
+        </a>
+      </li>
+      <li>
+        <a href="#publishers-section">
+          <i class="fas fa-user-tie"></i>
+          <span>Publishers</span>
+        </a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+      <a href="{% url 'admin_logout' %}">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
 
-    <!-- ข้อความแจ้งเตือน -->
+  <!-- Main Content -->
+  <div class="main-content">
+    <header>
+      <div class="header-content">
+        <div class="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </div>
+        <div class="user-info">
+          <span>Welcome, {{ request.user.username }}</span>
+          <div class="user-avatar">
+            <i class="fas fa-user-shield"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Total Users</h4>
+          <p>{{ all_users|length }}</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon books">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Total Books</h4>
+          <p>{{ all_books|length }}</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon publishers">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Publishers</h4>
+          <p>{{ publisher_count|default:"0" }}</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon pending">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h4>Pending Approvals</h4>
+          <p>{{ pending_publishers|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages/Notifications -->
     {% if messages %}
-      <div class="alert alert-info">
-        <ul class="mb-0">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
+      <div class="notifications">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
       </div>
     {% endif %}
 
-    <!-- Section: Publisher Registrations Pending Approval -->
-    <div class="section">
-      <h2>Pending Publisher Registrations</h2>
+    <!-- Pending Publishers Section -->
+    <div class="section" id="publishers-section">
+      <div class="section-header">
+        <h2><i class="fas fa-user-tie"></i> Pending Publisher Registrations</h2>
+        {% if pending_publishers %}
+          <span class="badge bg-danger">{{ pending_publishers|length }} pending</span>
+        {% else %}
+          <span class="badge bg-success">0 pending</span>
+        {% endif %}
+      </div>
+      
       {% if pending_publishers %}
         <div class="table-container">
-          <table class="table table-bordered table-striped">
+          <table class="table">
             <thead>
               <tr>
                 <th>Email</th>
                 <th>Name</th>
+                <th>Registration Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {% for publisher in pending_publishers %}
                 <tr>
-                  <td>{{ publisher.email }}</td>
-                  <td>{{ publisher.first_name }}</td>
                   <td>
-                    <a href="{% url 'approve_publisher' publisher.id %}" class="btn btn-success btn-sm">Approve</a>
-                    <a href="{% url 'reject_publisher' publisher.id %}" class="btn btn-danger btn-sm">Reject</a>
+                    <div class="table-user">
+                      <i class="fas fa-envelope"></i>
+                      {{ publisher.email }}
+                    </div>
+                  </td>
+                  <td>{{ publisher.first_name }}</td>
+                  <td>{{ publisher.date_joined|date:"M d, Y" }}</td>
+                  <td class="actions">
+                    <button onclick="location.href='{% url 'approve_publisher' publisher.id %}'" class="btn btn-success">
+                      <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button onclick="location.href='{% url 'reject_publisher' publisher.id %}'" class="btn btn-danger">
+                      <i class="fas fa-times"></i> Reject
+                    </button>
                   </td>
                 </tr>
               {% endfor %}
@@ -71,22 +173,34 @@
           </table>
         </div>
       {% else %}
-        <p>No pending publisher registrations.</p>
+        <div class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <p>No pending publisher registrations</p>
+        </div>
       {% endif %}
     </div>
 
-    <!-- Section: All Users -->
-    <div class="section">
-      <h2>All Users</h2>
+    <!-- All Users Section -->
+    <div class="section" id="users-section">
+      <div class="section-header">
+        <h2><i class="fas fa-users"></i> All Users</h2>
+        <div class="section-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="userSearch" placeholder="Search users...">
+          </div>
+        </div>
+      </div>
+      
       <div class="table-container">
-        <table class="table table-bordered table-striped">
+        <table class="table" id="usersTable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Email</th>
-              <th>Name</th>
+              <th>User</th>
               <th>Role</th>
-              <th>Active</th>
+              <th>Status</th>
+              <th>Joined Date</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -94,12 +208,46 @@
             {% for user in all_users %}
               <tr>
                 <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.profile.user_type }}</td>
-                <td>{{ user.is_active }}</td>
                 <td>
-                  <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm">Delete</a>
+                  <div class="table-user">
+                    {% if user.is_superuser %}
+                      <i class="fas fa-user-shield"></i>
+                    {% elif user.profile.user_type == 'publisher' %}
+                      <i class="fas fa-user-tie"></i>
+                    {% else %}
+                      <i class="fas fa-user"></i>
+                    {% endif %}
+                    <div class="user-details">
+                      <span class="user-name">{{ user.username }}</span>
+                      <span class="user-email">{{ user.email }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge 
+                    {% if user.is_superuser %}bg-danger
+                    {% elif user.profile.user_type == 'publisher' %}bg-primary
+                    {% else %}bg-success{% endif %}">
+                    {% if user.is_superuser %}Admin
+                    {% else %}{{ user.profile.user_type|title }}{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-pill {% if user.is_active %}active{% else %}inactive{% endif %}">
+                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                  </span>
+                </td>
+                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                <td class="actions">
+                  {% if not user.is_superuser %}
+                    <button onclick="confirmDelete('{% url 'delete_user' user.id %}', '{{ user.username }}')" class="btn btn-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  {% else %}
+                    <button disabled class="btn btn-action">
+                      <i class="fas fa-lock"></i>
+                    </button>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
@@ -108,17 +256,27 @@
       </div>
     </div>
 
-    <!-- Section: All Books -->
-    <div class="section">
-      <h2>All Books</h2>
+    <!-- All Books Section -->
+    <div class="section" id="books-section">
+      <div class="section-header">
+        <h2><i class="fas fa-book"></i> All Books</h2>
+        <div class="section-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="bookSearch" placeholder="Search books...">
+          </div>
+        </div>
+      </div>
+      
       <div class="table-container">
-        <table class="table table-bordered table-striped">
+        <table class="table" id="booksTable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Title</th>
+              <th>Book</th>
               <th>Publisher</th>
-              <th>Borrow Count</th>
+              <th>Status</th>
+              <th>Borrowed</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -126,11 +284,49 @@
             {% for book in all_books %}
               <tr>
                 <td>{{ book.id }}</td>
-                <td>{{ book.title }}</td>
-                <td>{{ book.publisher.first_name }}</td>
-                <td>{{ book.borrow_count }}</td>
                 <td>
-                  <a href="{% url 'delete_book' book.id %}" class="btn btn-danger btn-sm">Delete</a>
+                  <div class="table-book">
+                    <div class="book-cover">
+                      {% if book.cover_image %}
+                        <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+                      {% else %}
+                        <div class="no-cover">
+                          <i class="fas fa-book"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="book-details">
+                      <span class="book-title">{{ book.title }}</span>
+                      <span class="book-tags">
+                        {% for tag in book.tags.all %}
+                          <span class="book-tag">{{ tag.name }}</span>
+                        {% endfor %}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="table-user">
+                    <i class="fas fa-user-tie"></i>
+                    {{ book.publisher.username }}
+                  </div>
+                </td>
+                <td>
+                  <span class="status-pill {% if book.max_borrowers > book.borrow_count %}active{% else %}unavailable{% endif %}">
+                    {% if book.max_borrowers > book.borrow_count %}Available{% else %}Unavailable{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <div class="borrow-count">
+                    <i class="fas fa-users"></i>
+                    <span>{{ book.borrow_count }}</span>
+                    <span class="count-label">times</span>
+                  </div>
+                </td>
+                <td class="actions">
+                  <button onclick="confirmDelete('{% url 'delete_book' book.id %}', '{{ book.title }}')" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </td>
               </tr>
             {% endfor %}
@@ -140,7 +336,111 @@
     </div>
   </div>
 
-  <!-- เพิ่ม Bootstrap JS CDN -->
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete <span id="deleteItemName"></span>?
+          <p class="text-danger mt-2">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Custom JS -->
+  <script>
+    // Toggle sidebar
+    document.querySelector('.menu-toggle').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
+      document.querySelector('.main-content').classList.toggle('expanded');
+    });
+
+    // Table search functionality
+    function setupSearch(inputId, tableId, minLength = 2) {
+      const searchInput = document.getElementById(inputId);
+      const table = document.getElementById(tableId);
+      
+      if (searchInput && table) {
+        searchInput.addEventListener('keyup', function() {
+          const searchText = this.value.toLowerCase();
+          
+          if (searchText.length < minLength && searchText.length > 0) return;
+          
+          const rows = table.getElementsByTagName('tr');
+          
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            let found = false;
+            
+            for (let j = 0; j < cells.length; j++) {
+              const cellText = cells[j].textContent.toLowerCase();
+              
+              if (cellText.indexOf(searchText) > -1) {
+                found = true;
+                break;
+              }
+            }
+            
+            if (found) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          }
+        });
+      }
+    }
+    
+    // Delete confirmation
+    function confirmDelete(deleteUrl, itemName) {
+      const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+      document.getElementById('deleteItemName').textContent = itemName;
+      document.getElementById('confirmDeleteBtn').href = deleteUrl;
+      modal.show();
+    }
+    
+    // Initialize search for tables
+    document.addEventListener('DOMContentLoaded', function() {
+      setupSearch('userSearch', 'usersTable');
+      setupSearch('bookSearch', 'booksTable');
+      
+      // Highlight active nav link based on scroll position
+      const sections = document.querySelectorAll('.section');
+      const navLinks = document.querySelectorAll('.nav-links li a');
+      
+      window.addEventListener('scroll', function() {
+        let current = '';
+        
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          
+          if (pageYOffset >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+          }
+        });
+        
+        navLinks.forEach(link => {
+          link.parentElement.classList.remove('active');
+          if (link.getAttribute('href').includes(current)) {
+            link.parentElement.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

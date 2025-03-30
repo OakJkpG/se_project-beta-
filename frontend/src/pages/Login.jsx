@@ -1,9 +1,10 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import './Auth.css';
+import './auth.css';
+import SignupModal from "../components/account/SignupModal";
+import { FaUser, FaLock, FaBook, FaGoogle } from 'react-icons/fa';
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
@@ -11,24 +12,25 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/login/', { identifier, password });
-      
+
       // Get token and user info
       const { token, role } = response.data;
       const userId = response.data.userId || '1'; // Get userId from response or use default
-      
+
       // Store in localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
       localStorage.setItem('userId', userId);
-      
+
       // Navigate based on role
       if (role === 'reader') {
         navigate(`/account/reader/${userId}`);
@@ -48,23 +50,23 @@ const Login = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setError(null);
     setLoading(true);
-    
+
     try {
       // Send the Google ID token to your backend
       const response = await axios.post('http://127.0.0.1:8000/api/google-login/', {
         token: credentialResponse.credential,
         user_type: 'reader' // Always set as reader
       });
-      
+
       // Get token and user info
       const { token, role } = response.data;
       const userId = response.data.userId || '1';
-      
+
       // Store in localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
       localStorage.setItem('userId', userId);
-      
+
       // Since this is reader-only login, always navigate to reader account
       navigate(`/account/reader/${userId}`);
     } catch (err) {
@@ -81,59 +83,136 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page">
-      <h2>Login</h2>
-      {error && <p className="error">{error}</p>}
-      
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email or Username:</label>
-          <input 
-            type="text" 
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            required 
-            disabled={loading}
-          />
+    <div className="login-container">
+      <div className="login-form-container">
+        <div className="login-left">
+          <div className="login-header">
+            <div className="app-logo">
+              <FaBook className="logo-icon" />
+              <h1>BookHub</h1>
+            </div>
+            <p className="slogan">Your digital library, anywhere, anytime.</p>
+          </div>
+          <div className="login-features">
+            <div className="feature-item">
+              <div className="feature-icon">📚</div>
+              <div className="feature-text">
+                <h3>Extensive Library</h3>
+                <p>Access thousands of books across genres</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">🔄</div>
+              <div className="feature-text">
+                <h3>Easy Borrowing</h3>
+                <p>Borrow books with just a few clicks</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">📱</div>
+              <div className="feature-text">
+                <h3>Read Anywhere</h3>
+                <p>Access your books on any device</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label>Password:</label>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-            disabled={loading}
-          />
+
+        <div className="login-right">
+          <div className="login-form-header">
+            <h2>Welcome Back</h2>
+            <p>Sign in to your account to continue</p>
+          </div>
+
+          {error && (
+            <div className="error-message">
+              <p>{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <div className="input-icon">
+                <FaUser />
+              </div>
+              <input
+                type="text"
+                placeholder="Email or Username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <div className="input-icon">
+                <FaLock />
+              </div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-options">
+              <div className="remember-me">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Remember me</label>
+              </div>
+              <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
+            </div>
+
+            <button
+              type="submit"
+              className="login-button"
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="separator">
+            <span>OR</span>
+          </div>
+
+          <div className="google-login-container">
+            <div className="google-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="filled_black"
+                text="signin_with"
+                shape="pill"
+                size="large"
+                disabled={loading}
+              />
+            </div>
+            <p className="google-login-note">
+              <FaGoogle /> Sign in with Google is for readers only
+            </p>
+          </div>
+
+          <div className="signup-options">
+            <p>Don't have an account?</p>
+            <Link
+              onClick={() => setIsSignupModalOpen(true)}
+              className="nav-link signup-button"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      
-      <div className="separator">
-        <span>OR</span>
       </div>
-      
-      <div className="google-login-container">
-        <p className="google-login-note">Sign in with Google is for readers only</p>
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleError}
-          useOneTap
-          theme="filled_blue"
-          text="signin_with"
-          shape="rectangular"
-          size="large"
-          disabled={loading}
-        />
-      </div>
-      
-      <p>
-        Don't have an account?&nbsp;
-        <Link to="/signup/reader">Signup as Reader</Link> |&nbsp;
-        <Link to="/signup/publisher">Signup as Publisher</Link>
-      </p>
+      <SignupModal 
+        isOpen={isSignupModalOpen} 
+        onClose={() => setIsSignupModalOpen(false)} 
+      />
     </div>
   );
 };

@@ -1,20 +1,21 @@
-/* src/pages/Account.css */
+/* Modern Account Pages Styling */
 .account-page {
   display: flex;
-  padding: 30px;
-  gap: 30px;
-  background-color: #f8f8f8;
   min-height: 100vh;
+  background-color: #282828;
+  color: #e0e0e0;
 }
 
+/* Sidebar / Profile Section */
 .account-left {
   flex: 0 0 300px;
-  background-color: #333;
+  background-color: #1e1e1e;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   height: fit-content;
+  position: sticky;
+  top: 30px;
 }
 
 .account-left img {
@@ -25,6 +26,7 @@
   border: 4px solid #ff6b00;
   margin: 0 auto 20px;
   display: block;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .account-left h2 {
@@ -35,15 +37,25 @@
 }
 
 .account-left p {
-  margin: 10px 0;
-  color: #ddd;
+  margin: 12px 0;
+  color: #cccccc;
   font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.account-left p span:first-child {
+  color: #a0a0a0;
+}
+
+.account-left p span:last-child {
+  font-weight: 500;
 }
 
 .logout-button {
   width: 100%;
   padding: 12px;
-  margin-top: 20px;
+  margin-top: 30px;
   background-color: #ff6b00;
   color: white;
   border: none;
@@ -59,70 +71,136 @@
   transform: translateY(-2px);
 }
 
+/* Main Content Area */
 .account-right {
   flex: 1;
-  background-color: white;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.account-right h3 {
-  color: #333;
-  font-size: 1.5rem;
+.section-header {
   margin-bottom: 20px;
-  padding-bottom: 10px;
   border-bottom: 2px solid #ff6b00;
+  padding-bottom: 10px;
 }
 
+.section-header h3 {
+  color: #ff6b00;
+  font-size: 24px;
+  margin: 0;
+}
+
+/* Borrowed Books Grid */
 .borrowed-books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
+/* No Books Message */
+.no-books-message {
+  font-style: italic;
+  color: #999;
+}
+
+/* Top Controls */
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.top-controls button {
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-controls button:hover {
+  background-color: #ff8533;
+  transform: translateY(-2px);
+}
+
+.account-right h3 {
+  color: #ff6b00;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #333;
+}
+
+/* Books Grid */
+.books-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 25px;
+}
+
 .book-item {
-  background-color: white;
+  background-color: #222;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  border: 1px solid #eee;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
 }
 
 .book-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .book-cover {
   height: 200px;
   overflow: hidden;
+  position: relative;
 }
 
 .book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.book-item:hover .book-cover img {
+  transform: scale(1.05);
 }
 
 .book-info {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .book-info h4 {
-  color: #333;
+  color: #e0e0e0;
   margin-bottom: 10px;
   font-size: 1.2rem;
+  line-height: 1.4;
 }
 
-.due-date {
-  color: #666;
+.due-date, .borrow-count {
   margin-bottom: 15px;
   font-size: 0.9rem;
+  color: #a0a0a0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.due-date span {
+.due-date span, .borrow-count span {
   color: #ff6b00;
   font-weight: 600;
 }
@@ -130,10 +208,10 @@
 .book-actions {
   display: flex;
   gap: 10px;
+  margin-top: auto;
 }
 
-.read-button, 
-.return-button {
+.book-actions button {
   flex: 1;
   padding: 10px;
   border: none;
@@ -141,23 +219,27 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
 }
 
-.read-button {
+.read-button, .edit-button {
   background-color: #ff6b00;
   color: white;
 }
 
-.read-button:hover {
+.read-button:hover, .edit-button:hover {
   background-color: #ff8533;
 }
 
-.return-button {
+.return-button, .remove-button {
   background-color: #333;
-  color: white;
+  color: #e0e0e0;
 }
 
-.return-button:hover {
+.return-button:hover, .remove-button:hover {
   background-color: #444;
 }
 
@@ -169,7 +251,6 @@
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 1s linear infinite;
-  margin-right: 8px;
 }
 
 @keyframes spin {
@@ -178,6 +259,7 @@
   }
 }
 
+/* Notification */
 .notification {
   position: fixed;
   top: 20px;
@@ -187,14 +269,17 @@
   color: white;
   z-index: 1000;
   animation: slideIn 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .notification.success {
-  background-color: #ff6b00;
+  background-color: #28a745;
+  border-left: 4px solid #1e7e34;
 }
 
 .notification.error {
-  background-color: #f44336;
+  background-color: #dc3545;
+  border-left: 4px solid #bd2130;
 }
 
 @keyframes slideIn {
@@ -208,14 +293,19 @@
   }
 }
 
+/* Empty States */
 .no-books-message {
   text-align: center;
-  padding: 40px;
-  color: #666;
+  padding: 60px 20px;
+  color: #a0a0a0;
+}
+
+.no-books-message p {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
 }
 
 .no-books-message button {
-  margin-top: 20px;
   padding: 12px 24px;
   background-color: #ff6b00;
   color: white;
@@ -229,4 +319,563 @@
 .no-books-message button:hover {
   background-color: #ff8533;
   transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: #222;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: #e0e0e0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+}
+
+.modal-content h3 {
+  color: #ff6b00;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #333;
+  font-size: 1.5rem;
+}
+
+/* Form Styles */
+.book-form {
+  display: grid;
+  grid-gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #cccccc;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ff6b00;
+}
+
+/* Tag Selection Styles */
+.tag-selection {
+  margin-top: 0.5rem;
+}
+
+.tag-selection button {
+  background: #333;
+  border: 1px solid #444;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e0e0e0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tag-selection button:hover {
+  background: #444;
+  border-color: #555;
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag-item {
+  background: #333;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #ff6b00;
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-tag:hover {
+  color: #ff6b00;
+}
+
+/* File Upload Styles */
+.file-upload {
+  border: 2px dashed #444;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-upload:hover {
+  border-color: #ff6b00;
+  background-color: rgba(255, 107, 0, 0.05);
+}
+
+.file-upload input {
+  width: 100%;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.modal-actions button[type="submit"] {
+  background: #ff6b00;
+  color: white;
+  border: none;
+}
+
+.modal-actions button[type="submit"]:hover {
+  background: #ff8533;
+}
+
+.modal-actions button[type="button"] {
+  background: #333;
+  color: #e0e0e0;
+  border: none;
+}
+
+.modal-actions button[type="button"]:hover {
+  background: #444;
+}
+
+/* Tag Modal Specific */
+.tag-modal .tags-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.tag-modal .tag-item {
+  display: flex;
+  align-items: center;
+}
+
+.tag-modal label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background-color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-modal label:hover {
+  background-color: #444;
+}
+
+.tag-modal input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Loading and Error States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #101010;
+  color: #e0e0e0;
+  padding: 30px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #ff6b00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30px;
+}
+
+.error-container button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.error-container button:hover {
+  background-color: #ff8533;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .account-page {
+    flex-direction: column;
+  }
+  
+  .account-left {
+    width: 100%;
+    position: static;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .account-page {
+    padding: 15px;
+  }
+  
+  .books-list, .borrowed-books-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+}
+
+/* Additional styles for the enhanced AccountReader.jsx */
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Account Badge */
+.account-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.account-badge.reader {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.account-badge.publisher {
+  background-color: #ff6b00;
+  color: white;
+}
+
+/* Account Stats */
+.account-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 15px 0;
+  padding: 15px 0;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+/* Account Actions */
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.account-button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-align: center;
+  border: none;
+}
+
+.account-button.secondary {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.account-button.secondary:hover {
+  background-color: #3a3a3a;
+}
+
+.account-button.logout {
+  background-color: #ff6b00;
+  color: white;
+}
+
+.account-button.logout:hover {
+  background-color: #ff8533;
+}
+
+.account-button.primary {
+  background-color: #ff6b00;
+  color: white;
+}
+
+.account-button.primary:hover {
+  background-color: #ff8533;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #333;
+}
+
+.section-header h3 {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.book-count {
+  background-color: #ff6b00;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Due Status */
+.due-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.due-badge.on-time {
+  background-color: #4CAF50;
+}
+
+.due-badge.due-soon {
+  background-color: #ff9800;
+}
+
+.due-badge.overdue {
+  background-color: #f44336;
+}
+
+/* Book Meta */
+.book-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.book-meta p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.book-meta svg {
+  color: #ff6b00;
+}
+
+/* Book Tags */
+.book-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.tag-pill {
+  background-color: #333;
+  color: #ff6b00;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+/* Empty State */
+.no-books-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-books-message img {
+  width: 150px;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.no-books-message h3 {
+  color: #ff6b00;
+  margin-bottom: 10px;
+}
+
+.no-books-message p {
+  color: #a0a0a0;
+  margin-bottom: 20px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Reading History */
+.reading-history {
+  margin-top: 40px;
+}
+
+.history-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.history-item {
+  display: flex;
+  background-color: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.history-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.history-details {
+  padding: 10px;
+}
+
+.history-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+}
+
+.history-details p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #a0a0a0;
+}
+
+/* Spinner animation */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

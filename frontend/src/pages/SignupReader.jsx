@@ -53,7 +53,7 @@ const SignupReader = () => {
 
   return (
     <div className="auth-page">
-      <h2>Signup as Reader</h2>
+      <h2>Sign up as Reader</h2>
       {error && <p className="error">{error}</p>}
       
       {step === 1 && (
@@ -74,7 +74,7 @@ const SignupReader = () => {
             <label>Confirm Password:</label>
             <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
           </div>
-          <button type="submit">Signup</button>
+          <button type="submit">Sign up</button>
         </form>
       )}
 

@@ -228,6 +228,13 @@ LOGGING = {
     },
 }
 
+CELERY_BEAT_SCHEDULE = {
+    'auto-return-overdue-books': {
+        'task': 'books.tasks.auto_return_overdue_books',
+        'schedule': 3600.0,  # ทำงานทุก 1 ชั่วโมง
+    },
+}
+
 
 
 

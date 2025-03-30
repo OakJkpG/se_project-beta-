@@ -60,5 +60,50 @@ class BookBorrow(models.Model):
             self.due_date = timezone.now() + timedelta(days=self.book.lending_period)
         super().save(*args, **kwargs)
 
+    def get_countdown(self):
+        """Calculate countdown to due date"""
+        if self.returned_at:
+            return None
+        
+        now = timezone.now()
+        time_left = self.due_date - now
+        
+        # Convert to total seconds
+        seconds_left = time_left.total_seconds()
+        
+        if seconds_left <= 0:
+            return "Overdue"
+            
+        # Calculate days, hours, minutes
+        days = int(seconds_left // (24 * 3600))
+        hours = int((seconds_left % (24 * 3600)) // 3600)
+        minutes = int((seconds_left % 3600) // 60)
+        
+        return {
+            'days': days,
+            'hours': hours,
+            'minutes': minutes,
+            'total_seconds': seconds_left
+        }
+
+    def is_overdue(self):
+        """Check if the book is overdue"""
+        if self.returned_at:
+            return False
+        return timezone.now() > self.due_date
+
+    def auto_return(self):
+        """Automatically return the book"""
+        if not self.returned_at and self.is_overdue():
+            self.returned_at = timezone.now()
+            self.save()
+            
+            # Update book's borrow count
+            self.book.borrow_count = max(0, self.book.borrow_count - 1)
+            self.book.save()
+            
+            return True
+        return False
+
     def __str__(self):
         return f"{self.reader.username} borrowed {self.book.title}"

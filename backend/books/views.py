@@ -16,6 +16,8 @@ from django.conf import settings
 from .storages import PrivateMediaStorage
 from supabase import create_client
 import logging
+from django.core.files.storage import default_storage
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -107,8 +109,51 @@ class RemoveBookView(APIView):
     def delete(self, request, book_id):
         user = request.user
         book = get_object_or_404(Book, id=book_id, publisher=user)
+
+        # ลบไฟล์ cover_image ถ้ามี
+        if book.cover_image:
+            try:
+                # แปลง URL เป็น path สำหรับ Supabase
+                parsed_url = urlparse(book.cover_image)
+                file_path = parsed_url.path.replace("storage/v1/object/public/Bookhub_media/", "")  # ลบส่วนเกินออก
+                bucket_name = "Bookhub_media"  # Bucket สำหรับ cover_image
+
+                # ตรวจสอบว่า path ไม่มีส่วนที่ซ้ำซ้อนและไม่มี '/' เกินมา
+                if not file_path.startswith("covers/"):
+                    file_path = f"{file_path.lstrip('/')}"
+
+                # Debug: ตรวจสอบ path และ bucket
+                logger.info(f"Attempting to delete cover image: bucket={bucket_name}, file_path={file_path}")
+
+                response = supabase.storage.from_(bucket_name).remove([file_path])
+                if isinstance(response, list) and response and "error" in response[0]:
+                    logger.error(f"Error deleting cover image: {response[0]['error']}")
+                else:
+                    logger.info(f"Cover image deleted successfully: {file_path}")
+            except Exception as e:
+                logger.error(f"Error deleting cover image: {e}")
+
+        # ลบไฟล์ pdf_file ถ้ามี
+        if book.pdf_file:
+            try:
+                file_path = book.pdf_file.name  # ใช้ชื่อไฟล์ตรงๆ
+                bucket_name = "Bookhub_pdf"  # Bucket สำหรับ pdf_file
+
+                # Debug: ตรวจสอบ path และ bucket
+                logger.info(f"Attempting to delete PDF file: bucket={bucket_name}, file_path=pdfs/{file_path}")
+
+                response = supabase.storage.from_(bucket_name).remove([f"pdfs/{file_path}"])
+                if isinstance(response, list) and response and "error" in response[0]:
+                    logger.error(f"Error deleting PDF file: {response[0]['error']}")
+                else:
+                    logger.info(f"PDF file deleted successfully: pdfs/{file_path}")
+            except Exception as e:
+                logger.error(f"Error deleting PDF file: {e}")
+
+        # ลบหนังสือ
         book.delete()
-        return Response({"message": "Book removed successfully."},
+
+        return Response({"message": "Book and associated files removed successfully."},
                         status=status.HTTP_200_OK)
 
 class ReaderAccountView(APIView):
@@ -119,7 +164,17 @@ class ReaderAccountView(APIView):
         if hasattr(user, 'profile') and user.profile.user_type != 'reader':
             return Response({"error": "Not authorized."},
                             status=status.HTTP_403_FORBIDDEN)
-        borrowed = BookBorrow.objects.filter(reader=user)
+        
+        # เปลี่ยนจาก borrowed = BookBorrow.objects.filter(reader=user)
+        # เป็นการquery เฉพาะหนังสือที่ยังไม่ได้คืน (returned_at is None)
+        borrowed = BookBorrow.objects.filter(
+            reader=user,
+            returned_at__isnull=True  # เพิ่มเงื่อนไขนี้
+        )
+        
+        # นับจำนวนหนังสือที่ยืมทั้งหมด (รวมที่คืนแล้ว)
+        total_borrowed = BookBorrow.objects.filter(reader=user).count()
+        
         borrow_serializer = BookBorrowSerializer(borrowed, many=True)
         data = {
             "user": {
@@ -127,7 +182,8 @@ class ReaderAccountView(APIView):
                 "email": user.email,
                 "role": user.profile.user_type,
                 "registered_at": user.date_joined,
-                "borrow_count": borrowed.count(),
+                "borrow_count": total_borrowed,  # แสดงจำนวนหนังสือที่เคยยืมทั้งหมด
+                "active_borrows": borrowed.count(),  # เพิ่มจำนวนหนังสือที่ยังไม่ได้คืน
             },
             "borrowed_books": borrow_serializer.data
         }
@@ -196,26 +252,105 @@ class ReadBookView(APIView):
 
 class EditBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def delete_file_from_supabase(self, file_url, bucket_name):
+        """Helper method to delete file from Supabase"""
+        try:
+            parsed_url = urlparse(file_url)
+            file_path = parsed_url.path.replace(f"storage/v1/object/public/{bucket_name}/", "")
+            file_path = file_path.lstrip('/')
+            
+            logger.info(f"Attempting to delete file: bucket={bucket_name}, file_path={file_path}")
+            
+            response = supabase.storage.from_(bucket_name).remove([file_path])
+            if isinstance(response, list) and response and "error" in response[0]:
+                logger.error(f"Error deleting file: {response[0]['error']}")
+            else:
+                logger.info(f"File deleted successfully: {file_path}")
+                
+        except Exception as e:
+            logger.error(f"Error deleting file: {e}")
 
     def put(self, request, book_id):
         try:
-            # Get book and verify ownership
-            book = Book.objects.get(id=book_id, publisher=request.user)
+            # Get the book to update
+            book = get_object_or_404(Book, id=book_id, publisher=request.user)
             
-            # Update book with partial data
-            serializer = BookSerializer(
-                book,
-                data=request.data,
-                partial=True  # Allow partial updates
+            # Extract data from request
+            data = request.data.copy()
+            logger.info(f"Received data for book update: {data.keys()}")
+            
+            # Handle cover image
+            if 'cover_image' in data and data['cover_image']:
+                if isinstance(data['cover_image'], str) and data['cover_image'] != book.cover_image:
+                    # Delete old cover image if exists and different from new one
+                    if book.cover_image:
+                        self.delete_file_from_supabase(book.cover_image, "Bookhub_media")
+                    book.cover_image = data['cover_image']
+            
+            # Handle PDF file
+            if 'pdf_file' in data and data['pdf_file']:
+                if isinstance(data['pdf_file'], str) and data['pdf_file'] != book.pdf_file.url:
+                    # Delete old PDF if exists and different from new one
+                    if book.pdf_file:
+                        self.delete_file_from_supabase(book.pdf_file.url, "Bookhub_pdf")
+                    book.pdf_file = data['pdf_file']
+            
+            # Handle text fields
+            if 'title' in data:
+                book.title = data['title']
+            if 'description' in data:
+                book.description = data['description']
+            if 'lending_period' in data and data['lending_period']:
+                book.lending_period = int(data['lending_period'])
+            if 'max_borrowers' in data and data['max_borrowers']:
+                book.max_borrowers = int(data['max_borrowers'])
+            
+            # Handle tags
+            if 'tags' in data and data['tags']:
+                try:
+                    import json
+                    tags_list = json.loads(data['tags'])
+                    book.tags.clear()
+                    for tag_name in tags_list:
+                        tag, created = Tag.objects.get_or_create(name=tag_name)
+                        book.tags.add(tag)
+                except Exception as e:
+                    logger.error(f"Error processing tags: {str(e)}")
+            
+            # Save the updated book
+            book.save()
+            logger.info(f"Book {book_id} updated successfully")
+            
+            # Return serialized book data
+            serializer = BookSerializer(book)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Error updating book {book_id}: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class AccountReaderView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        try:
+            # Check and auto-return overdue books before sending response
+            user_borrows = BookBorrow.objects.filter(
+                reader=request.user,
+                returned_at__isnull=True
             )
             
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-        except Book.DoesNotExist:
+            for borrow in user_borrows:
+                if borrow.is_overdue():
+                    borrow.auto_return()
+
+            # ...existing code for getting account data...
+
+        except Exception as e:
             return Response(
-                {"detail": "Book not found or you don't have permission to edit it"},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+

@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { FaSearch, FaTimes } from 'react-icons/fa'; // Make sure to install react-icons
 import './MainPage.css';
 
 const MainPage = () => {
   const [books, setBooks] = useState([]);
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [tags, setTags] = useState([]);
   const [user, setUser] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [isTagOpen, setIsTagOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterBy, setFilterBy] = useState('all');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    
     if (!token) {
       setError('Unauthorized. Please login.');
       setLoading(false);
@@ -29,71 +33,74 @@ const MainPage = () => {
       return response;
     };
 
-    // ดึงข้อมูลหนังสือทั้งหมด
-    axios.get('http://127.0.0.1:8000/api/books/', {
-      headers: { Authorization: `Token ${token}` },
-    })
-      .then(response => logResponse('Books', response))
-      .then(response => setBooks(response.data))
-      .catch(err => {
-        console.error("Error fetching books:", err);
-        setError('Failed to load books. Please try again later.');
+    // ดึงข้อมูลหนังสือและแท็ก
+    Promise.all([
+      axios.get('http://127.0.0.1:8000/api/books/', {
+        headers: { Authorization: `Token ${token}` }
+      }),
+      axios.get('http://127.0.0.1:8000/api/tags/', {
+        headers: { Authorization: `Token ${token}` }
       })
-      .finally(() => setLoading(false));
-
-    // ดึงข้อมูลแท็กทั้งหมดจาก Database
-    axios.get('http://127.0.0.1:8000/api/tags/', {
-      headers: { Authorization: `Token ${token}` },
+    ])
+    .then(([booksResponse, tagsResponse]) => {
+      setBooks(booksResponse.data);
+      setTags(tagsResponse.data);
     })
-      .then(response => logResponse('Tags', response))
-      .then(response => setTags(response.data))
-      .catch(err => console.error("Error fetching tags:", err));
+    .catch(err => {
+      console.error("Error fetching data:", err);
+      setError('Failed to load data. Please try again later.');
+    })
+    .finally(() => setLoading(false));
+
+    // เลือก endpoint ตาม role
+    const userEndpoint = role === 'publisher' 
+      ? 'http://127.0.0.1:8000/api/account/publisher/'
+      : 'http://127.0.0.1:8000/api/account/reader/';
 
     // ดึงข้อมูลผู้ใช้
-    axios.get('http://127.0.0.1:8000/api/account/reader/', {
-      headers: { Authorization: `Token ${token}` },
+    axios.get(userEndpoint, {
+      headers: { Authorization: `Token ${token}` }
     })
       .then(response => logResponse('User', response))
       .then(response => {
-        // Fix: Store just the user object from the response
-        // The API returns { user: {...}, borrowed_books: [...] }
         setUser(response.data.user);
       })
       .catch(err => {
         console.error("Error fetching user info:", err);
-        // Try alternative user info endpoint
-        const role = localStorage.getItem('role');
-        if (role === 'publisher') {
-          axios.get('http://127.0.0.1:8000/api/account/publisher/', {
-            headers: { Authorization: `Token ${token}` },
-          })
-            .then(response => logResponse('Publisher', response))
-            .then(response => setUser(response.data.user))
-            .catch(err => console.error("Error fetching publisher info:", err));
-        }
+        setError('Failed to load user info');
       });
+
   }, []);
 
   // ฟังก์ชันกรองหนังสือตาม search query และ selected tags
   const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTags = selectedTags.length === 0 || 
+    // กรองตามการค้นหา
+    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // กรองตาม tags ที่เลือก
+    const matchesTags = selectedTags.length === 0 ||
       (book.tags && selectedTags.every(tag => book.tags.includes(tag)));
-    return matchesSearch && matchesTags;
+    
+    // กรองตามสถานะการมีให้ยืม
+    const matchesAvailability = filterBy === 'all' || 
+      (filterBy === 'available' && book.remaining_borrows > 0);
+
+    return matchesSearch && matchesTags && matchesAvailability;
   });
 
   // Add tag management functions
   const handleTagSelect = (tagName) => {
-    setSelectedTags(prev => 
-      prev.includes(tagName) 
+    setSelectedTags(prev =>
+      prev.includes(tagName)
         ? prev.filter(t => t !== tagName)
         : [...prev, tagName]
     );
   };
 
   const clearFilters = () => {
-    setSearchQuery('');
+    setSearchTerm('');
     setSelectedTags([]);
+    setFilterBy('all');
   };
 
   return (
@@ -116,34 +123,74 @@ const MainPage = () => {
           </div>
           <div className="tags-container">
             {tags.map(tag => (
-              <div key={tag.id} className="tag-option">
-                <label className="tag-checkbox">
-                  <input
-                    type="checkbox"
-                    value={tag.name}
-                    checked={selectedTags.includes(tag.name)}
-                    onChange={() => handleTagSelect(tag.name)}
-                  />
-                  <span className="tag-name">{tag.name}</span>
-                  <span className="tag-count">
-                    {books.filter(book => book.tags?.includes(tag.name)).length}
-                  </span>
-                </label>
-              </div>
+              <button
+                key={tag.id}
+                className={`tag-button ${selectedTags.includes(tag.name) ? 'selected' : ''}`}
+                onClick={() => handleTagSelect(tag.name)}
+              >
+                <span className="tag-name">{tag.name}</span>
+                <span className="tag-count">
+                  {books.filter(book => book.tags?.includes(tag.name)).length}
+                </span>
+              </button>
             ))}
           </div>
         </div>
 
         {/* ส่วนหลักของหน้าที่แสดงหนังสือ */}
         <div className="main-content">
+          
+          {/* Library Books Header */}
+          <div className="section-header">
+            <h2>Library Books</h2>
+          </div>
+
           {/* Search Bar ด้านขวาบน */}
           <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search books..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="search-bar">
+              <span className="search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Search for books by title, author, or tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  className="search-clear"
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Clear search"
+                >
+                  <FaTimes />
+                </button>
+              )}
+            </div>
+
+            {/* Optional: Show number of results */}
+            {filteredBooks.length > 0 && (
+              <div className="search-results-count">
+                Found {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+              </div>
+            )}
+
+            {/* Optional: Add search filters */}
+            <div className="search-filters">
+              <button
+                className={`filter-button ${filterBy === 'all' ? 'active' : ''}`}
+                onClick={() => setFilterBy('all')}
+              >
+                All Books
+              </button>
+              <button
+                className={`filter-button ${filterBy === 'available' ? 'active' : ''}`}
+                onClick={() => setFilterBy('available')}
+              >
+                Available Only
+              </button>
+              {/* Add more filter buttons as needed */}
+            </div>
           </div>
 
           {/* รายการหนังสือ */}
@@ -194,7 +241,7 @@ const MainPage = () => {
               <div className="no-results">
                 <img src="/no-result.png" alt="No books found" />
                 <p>No books match your search criteria.</p>
-                <button onClick={() => {setSearchQuery(''); setSelectedTags([]);}}>Clear Filters</button>
+                <button onClick={() => { setSearchTerm(''); setSelectedTags([]); }}>Clear Filters</button>
               </div>
             )}
           </div>
