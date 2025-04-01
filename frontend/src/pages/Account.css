@@ -98,8 +98,29 @@
 
 /* No Books Message */
 .no-books-message {
-  font-style: italic;
-  color: #999;
+  text-align: center;
+  padding: 3rem;
+  color: #888;
+}
+
+.no-books-message p {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.no-books-message button {
+  background: #ff6b00;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.no-books-message button:hover {
+  background: #ff8533;
 }
 
 /* Top Controls */
@@ -254,9 +275,8 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Notification */
@@ -291,34 +311,6 @@
     transform: translateX(0);
     opacity: 1;
   }
-}
-
-/* Empty States */
-.no-books-message {
-  text-align: center;
-  padding: 60px 20px;
-  color: #a0a0a0;
-}
-
-.no-books-message p {
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-}
-
-.no-books-message button {
-  padding: 12px 24px;
-  background-color: #ff6b00;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.no-books-message button:hover {
-  background-color: #ff8533;
-  transform: translateY(-2px);
 }
 
 /* Modal Styles */
@@ -550,40 +542,49 @@
 }
 
 /* Loading and Error States */
-.loading-container, .error-container {
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #101010;
   color: #e0e0e0;
-  padding: 30px;
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #ff6b00;
+  border: 4px solid #333;
+  border-top: 4px solid #ff6b00;
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
   animation: spin 1s linear infinite;
-  margin-bottom: 30px;
+  margin-bottom: 1rem;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  color: #e0e0e0;
 }
 
 .error-container button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  background-color: #ff6b00;
+  padding: 0.75rem 1.5rem;
+  background: #ff6b00;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
 }
 
 .error-container button:hover {
-  background-color: #ff8533;
+  background: #ff8533;
 }
 
 /* Responsive Design */
@@ -657,18 +658,19 @@
   border-bottom: 1px solid #333;
 }
 
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.stat-item-account {
+  display: flex ;
+  justify-content: space-between ;
+  align-items: center ;
+  padding: 0.75rem ;
 }
 
-.stat-label {
-  color: #a0a0a0;
-  font-size: 0.9rem;
+.stat-label-account {
+  color: #a0a0a0 ;
+  font-size: 0.9rem ; 
 }
 
-.stat-value {
+.stat-value-account {
   color: #e0e0e0;
   font-weight: 500;
 }
@@ -737,12 +739,9 @@
 }
 
 .book-count {
-  background-color: #ff6b00;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 20px;
+  color: #888;
   font-size: 0.9rem;
-  font-weight: 600;
+  margin: 0;
 }
 
 /* Due Status */

@@ -370,11 +370,27 @@ body {
 .remember-me {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   color: var(--text-color);
 }
 
-.remember-me input {
-  margin-right: 0.5rem;
+.remember-me input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.remember-me label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+}
+
+.remember-me input[type="checkbox"]:disabled,
+.remember-me input[type="checkbox"]:disabled + label {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .forgot-password {
@@ -458,16 +474,63 @@ body {
 }
 
 .error-message {
-  background-color: rgba(255, 77, 77, 0.1);
-  border-left: 3px solid var(--error-color);
-  color: var(--error-color);
-  padding: 12px;
-  border-radius: 5px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  padding: 1rem;
+  border-radius: 8px;
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .error-message p {
   margin: 0;
+  font-size: 0.9rem;
+}
+
+.form-description {
+  color: #888;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.success-message {
+  background-color: rgba(0, 200, 0, 0.1);
+  border: 1px solid rgba(0, 200, 0, 0.2);
+  color: #00c853;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.sub-message {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #666;
+}
+
+.back-to-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #ff6b00;
+  text-decoration: none;
+  padding: 0.75rem;
+  margin-top: 1.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-to-login:hover {
+  background-color: rgba(255, 107, 0, 0.1);
+  text-decoration: none;
+}
+
+.back-to-login svg {
   font-size: 0.9rem;
 }
 
@@ -581,4 +644,41 @@ body {
   .signup-buttons {
     flex-direction: column;
   }
+}
+
+/* Add to your Auth.css file */
+
+.password-group {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #888;
+  font-size: 1rem;
+  display: flex;
+  align-items: right;
+  justify-content: center;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.password-toggle:hover {
+  color: #ff6b00;
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+/* Adjust the padding of the password input to make room for the toggle button */
+.password-group input {
+  padding-right: 40px;
 }

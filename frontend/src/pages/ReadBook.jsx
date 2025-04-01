@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getAuthData } from '../utils/authUtils';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import './ReadBook.css';
+import { FaArrowLeft } from 'react-icons/fa';
 
 // Set worker source using the same version as pdfjs-dist
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -31,7 +33,7 @@ const ReadBook = () => {
           return;
         }
 
-        const token = localStorage.getItem('token');
+        const { token } = getAuthData();
         if (!token) {
           navigate('/login', { state: { from: `/read/${borrowId}` } });
           return;
@@ -58,6 +60,16 @@ const ReadBook = () => {
 
     fetchSignedUrl();
   }, [borrowId, navigate]);
+
+  useEffect(() => {
+    const handleCopy = (e) => {
+      e.preventDefault();
+      alert('Copying is disabled for security reasons.');
+    };
+
+    document.addEventListener('copy', handleCopy);
+    return () => document.removeEventListener('copy', handleCopy);
+  }, []);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -122,6 +134,13 @@ const ReadBook = () => {
       onContextMenu={preventContextMenu}
       onDragStart={preventDragStart}
     >
+      <div className="pdf-header">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <FaArrowLeft />
+          <span>Back to Account</span>
+        </button>
+      </div>
+
       <div className="pdf-controls">
         <div className="navigation-controls">
           <button onClick={goToPreviousPage} disabled={currentPage <= 1}>

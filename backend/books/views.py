@@ -48,18 +48,38 @@ class BorrowBookView(APIView):
     def post(self, request):
         user = request.user
         if hasattr(user, 'profile') and user.profile.user_type != 'reader':
-            return Response({"error": "Only readers can borrow books."},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"error": "Only readers can borrow books."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         book_id = request.data.get('book_id')
         book = get_object_or_404(Book, id=book_id)
+
+        # ตรวจสอบว่าผู้ใช้ยืมหนังสือเล่มนี้อยู่หรือไม่
+        if book.is_borrowed_by_user(user):
+            return Response(
+                {
+                    "error": "You have already borrowed this book and haven't returned it yet.",
+                    "status": "ALREADY_BORROWED"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not book.is_available:
-            return Response({"error": "Book is not available."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        borrow = BookBorrow.objects.create(reader=request.user, book=book)
+            return Response(
+                {"error": "Book is not available for borrowing."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        borrow = BookBorrow.objects.create(reader=user, book=book)
         book.borrow_count += 1
         book.save()
-        return Response({'message': 'Book borrowed successfully!', 'borrow_id': borrow.id},
-                        status=status.HTTP_201_CREATED)
+
+        return Response(
+            {'message': 'Book borrowed successfully!', 'borrow_id': borrow.id},
+            status=status.HTTP_201_CREATED
+        )
 
 class ReturnBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -353,4 +373,27 @@ class AccountReaderView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class DeleteTagView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, tag_id):
+        try:
+            tag = get_object_or_404(Tag, id=tag_id)
+            
+            # Check if tag is being used
+            if tag.book_set.count() > 0:
+                return Response({
+                    "error": "Cannot delete tag that is being used by books"
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            tag.delete()
+            return Response({
+                "message": f"Tag '{tag.name}' deleted successfully"
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 

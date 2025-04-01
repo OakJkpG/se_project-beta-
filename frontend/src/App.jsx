@@ -14,6 +14,8 @@ import MainPage from './pages/MainPage';
 import BookDetail from './pages/BookDetail';
 import EditBook from './pages/EditBook';
 import ReadBook from './pages/ReadBook';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Replace this with your Google Client ID
 const GOOGLE_CLIENT_ID = "922387380789-081ufgcic0l05iivp0lnqqu694cs6sbl.apps.googleusercontent.com";
@@ -36,6 +38,8 @@ function App() {
             <Route path="/books/:bookId" element={<BookDetail />} />
             <Route path="/books/:bookId/borrow" element={<BookDetail />} />
             <Route path="/edit-book/:bookId" element={<EditBook />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </Base>
       </Router>

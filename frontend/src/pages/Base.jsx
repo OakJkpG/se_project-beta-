@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import SignupModal from "../components/account/SignupModal";
+import { getAuthData, clearAuthData } from "../utils/authUtils";
 import "./Base.css";
 
 const Base = ({ children }) => {
@@ -10,19 +11,15 @@ const Base = ({ children }) => {
   const navigate = useNavigate();
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
-  // ดึงข้อมูลจาก localStorage
-  const token = localStorage.getItem("token");
-  const userRole = localStorage.getItem("role");
-  const userId = localStorage.getItem("userId");
+  // Get auth data from storage
+  const { token, role: userRole, userId } = getAuthData();
 
   // เส้นทางสำหรับหน้า Login/Signup
   const authRoutes = ["/", "/login", "/signup/reader", "/signup/publisher"];
   const isAuthPage = authRoutes.includes(location.pathname);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userId");
+    clearAuthData();
     navigate("/");
   };
 

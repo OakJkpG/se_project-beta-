@@ -1,0 +1,26 @@
+/* Add to your CSS file for BorrowedBookItem */
+.auto-return-notice {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: rgba(255, 107, 0, 0.1);
+  border-left: 3px solid #ff6b00;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  color: #ff6b00;
+}
+
+.auto-returning {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}

@@ -4,6 +4,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import random
 from django.db import transaction
+import uuid
+from datetime import timedelta
+from django.utils import timezone
 
 class Profile(models.Model):
     USER_TYPES = [
@@ -43,3 +46,14 @@ class Profile(models.Model):
         except User.profile.RelatedObjectDoesNotExist:
             # If no profile exists, create one
             Profile.objects.create(user=instance, user_type='reader')
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        """Check if the reset token is still valid (24 hours)"""
+        expiration_time = self.created_at + timedelta(hours=24)
+        return not self.is_used and timezone.now() <= expiration_time

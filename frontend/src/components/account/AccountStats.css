@@ -17,7 +17,7 @@
   gap: 1rem;
 }
 
-.stat-item {
+.stat-item-account {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,22 +27,23 @@
   transition: background-color 0.2s ease;
 }
 
-.stat-item:hover {
+.stat-item-account:hover {
   background: #2a2a2a;
 }
 
-.stat-label {
+.stat-label-account {
   color: #888;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.stat-label svg {
+.stat-label-account svg {
   color: #ff6b00;
 }
 
-.stat-value {
+.stat-value-account {
   color: #e0e0e0;
   font-weight: 500;
+  
 }

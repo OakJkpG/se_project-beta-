@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaTimes } from 'react-icons/fa'; // Make sure to install react-icons
 import './MainPage.css';
+
+const getAuthData = () => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const role = localStorage.getItem('role') || sessionStorage.getItem('role');
+  return { token, role };
+};
+
+const clearAuthData = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+};
 
 const MainPage = () => {
   const [books, setBooks] = useState([]);
@@ -11,29 +22,20 @@ const MainPage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [tags, setTags] = useState([]);
   const [user, setUser] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [isTagOpen, setIsTagOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('all');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const { token, role } = getAuthData();
     
     if (!token) {
-      setError('Unauthorized. Please login.');
-      setLoading(false);
+      navigate('/login');
       return;
     }
 
-    // Debug helper
-    const logResponse = (name, response) => {
-      console.log(`${name} API response:`, response.data);
-      return response;
-    };
-
-    // ดึงข้อมูลหนังสือและแท็ก
+    // Fetch data using token
     Promise.all([
       axios.get('http://127.0.0.1:8000/api/books/', {
         headers: { Authorization: `Token ${token}` }
@@ -47,30 +49,35 @@ const MainPage = () => {
       setTags(tagsResponse.data);
     })
     .catch(err => {
-      console.error("Error fetching data:", err);
-      setError('Failed to load data. Please try again later.');
+      if (err.response?.status === 401) {
+        clearAuthData();
+        navigate('/login');
+      }
+      setError('Failed to load data');
     })
     .finally(() => setLoading(false));
 
-    // เลือก endpoint ตาม role
-    const userEndpoint = role === 'publisher' 
-      ? 'http://127.0.0.1:8000/api/account/publisher/'
-      : 'http://127.0.0.1:8000/api/account/reader/';
+    // ตรวจสอบ role ก่อนเรียก API
+    if (role) {
+      const userEndpoint = role === 'publisher' 
+        ? 'http://127.0.0.1:8000/api/account/publisher/'
+        : 'http://127.0.0.1:8000/api/account/reader/';
 
-    // ดึงข้อมูลผู้ใช้
-    axios.get(userEndpoint, {
-      headers: { Authorization: `Token ${token}` }
-    })
-      .then(response => logResponse('User', response))
+      axios.get(userEndpoint, {
+        headers: { Authorization: `Token ${token}` }
+      })
       .then(response => {
         setUser(response.data.user);
       })
       .catch(err => {
         console.error("Error fetching user info:", err);
-        setError('Failed to load user info');
+        if (err.response?.status === 401) {
+          clearAuthData();
+          navigate('/login');
+        }
       });
-
-  }, []);
+    }
+  }, [navigate]);
 
   // ฟังก์ชันกรองหนังสือตาม search query และ selected tags
   const filteredBooks = books.filter(book => {

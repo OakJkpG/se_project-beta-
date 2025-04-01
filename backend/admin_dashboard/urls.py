@@ -10,4 +10,5 @@ urlpatterns = [
     path('user/<int:user_id>/delete/', views.delete_user, name='delete_user'),  # เพิ่มเส้นทางสำหรับลบผู้ใช้
     path('book/<int:book_id>/delete/', views.delete_book, name='delete_book'),  # เพิ่มเส้นทางสำหรับลบหนังสือ
     path('logout/', views.custom_logout, name='admin_logout'),  # เพิ่ม logout view
+    path('tag/<int:tag_id>/delete/', views.delete_tag, name='delete_tag'),
 ]

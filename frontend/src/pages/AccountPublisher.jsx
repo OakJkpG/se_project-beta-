@@ -14,6 +14,7 @@ import TagModal from '../components/book/TagModal';
 import NotificationBar from '../components/notifications/NotificationBar';
 import './Account.css';
 import axios from 'axios';
+import { getAuthData } from '../utils/authUtils';
 
 const AccountPublisher = () => {
   // eslint-disable-next-line no-unused-vars
@@ -38,9 +39,16 @@ const AccountPublisher = () => {
   }, [fetchAvailableTags]);
 
   const handleRemoveBook = useCallback((bookId, bookTitle) => {
+    const { token } = getAuthData();
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     if (window.confirm(`Are you sure you want to remove "${bookTitle}"?`)) {
       axios.delete(`http://127.0.0.1:8000/api/books/remove/${bookId}/`, {
-        headers: { Authorization: `Token ${localStorage.getItem('token')}` },
+        headers: { Authorization: `Token ${token}` },
       })
       .then(response => {
         console.log('Book deleted successfully', response);
@@ -52,7 +60,7 @@ const AccountPublisher = () => {
         showNotification('error', 'Failed to delete book');
       });
     }
-  }, [fetchAccountData, showNotification]);
+  }, [fetchAccountData, showNotification, navigate]);
 
   const handleTagSelection = (tagName) => {
     setNewBook(prev => {

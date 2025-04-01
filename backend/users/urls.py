@@ -6,6 +6,9 @@ from .views import (
     ReaderVerificationView,
     SignupPublisherView,
     GoogleLoginView,
+    ForgotPasswordView,
+    ResetPasswordView,
+    ValidateResetTokenView,
 )
 
 urlpatterns = [
@@ -14,4 +17,7 @@ urlpatterns = [
     path('signup/reader/verify/', ReaderVerificationView.as_view(), name='signup_reader_verify'),
     path('signup/publisher/', SignupPublisherView.as_view(), name='signup_publisher'),
     path('google-login/', GoogleLoginView.as_view(), name='google_login'),
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('reset-password/<uuid:token>/', ResetPasswordView.as_view(), name='reset_password'),
+    path('reset-password/<uuid:token>/validate/', ValidateResetTokenView.as_view(), name='validate_reset_token'),
 ]

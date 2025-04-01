@@ -22,7 +22,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'publisher', 'publisher_name', 'title', 'description', 'cover_image',
             'pdf_file', 'lending_period', 'max_borrowers', 'tags', 'remaining_borrows',
-            'borrow_count', 'custom_tag', 'selectedTags'
+            'borrow_count', 'custom_tag', 'selectedTags', 'publisher_id',
         ]
         read_only_fields = ['publisher', 'borrow_count']
 

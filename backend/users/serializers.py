@@ -62,19 +62,6 @@ class SignupReaderSerializer(serializers.ModelSerializer):
             is_active=False  # Set user as inactive until email verification
         )
         return user
-    
-    def _send_verification_email(self, email, verification_code):
-        """Helper method to send verification email"""
-        try:
-            send_mail(
-                'Your Verification Code',
-                f'Your verification code is: {verification_code}',
-                'bookhub.noreply@gmail.com',  # อีเมล Gmail ของคุณ
-                [email],
-                fail_silently=False,
-            )
-        except Exception as e:
-            raise serializers.ValidationError(f"Failed to send verification email: {str(e)}")
 
 class ReaderVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -152,12 +139,73 @@ class SignupPublisherSerializer(serializers.Serializer):
     def _send_admin_notification(self, publisher_email):
         """Helper method to send admin notification"""
         try:
+            html_message = f"""
+            <div style="font-family: 'Prompt', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #ff6b00; margin-bottom: 15px; font-size: 28px;">BookHub</h1>
+                    <div style="width: 50px; height: 3px; background-color: #ff6b00; margin: 0 auto 20px;"></div>
+                    <h2 style="color: #333; font-size: 24px; margin-bottom: 10px;">มีการลงทะเบียนผู้พิมพ์ใหม่</h2>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 25px; border-radius: 8px;">
+                    <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                        มีการลงทะเบียนผู้พิมพ์ใหม่ที่รอการอนุมัติ:<br>
+                        <strong>อีเมล:</strong> {publisher_email}
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin: 35px 0;">
+                    <a href="https://se-bookhub-be.onrender.com/adminpanel/dashboard/" 
+                       style="background-color: #ff6b00; 
+                              color: white; 
+                              padding: 15px 30px; 
+                              text-decoration: none; 
+                              border-radius: 5px;
+                              display: inline-block;
+                              font-weight: bold;
+                              font-size: 16px;">
+                        ไปที่หน้า Admin
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+                <div style="text-align: center;">
+                    <p style="color: #666; font-size: 14px; margin: 5px 0;">
+                        ขอแสดงความนับถือ<br>
+                        <strong style="color: #ff6b00;">ระบบ BookHub</strong>
+                    </p>
+                </div>
+            </div>
+            """
+
             send_mail(
-                'New Publisher Signup',
-                f'A new publisher has registered with email: {publisher_email}. Please review and activate the account.',
-                'bookhub.noreply@gmail.com',  # อีเมล Gmail ของคุณ
-                ['s6604062630099@email.kmutnb.ac.th'],  # อีเมลผู้ดูแลระบบ
+                '🔔 แจ้งเตือน: มีการลงทะเบียนผู้พิมพ์ใหม่',
+                f'มีผู้พิมพ์ใหม่ลงทะเบียนด้วยอีเมล: {publisher_email} กรุณาตรวจสอบและอนุมัติบัญชี',
+                'BookHub <bookhub.noreply@gmail.com>',
+                ['bookhub.noreply@gmail.com'],
                 fail_silently=False,
+                html_message=html_message
             )
         except Exception as e:
             raise serializers.ValidationError(f"Failed to send admin notification: {str(e)}")
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            User.objects.get(email=value)
+            return value
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No user found with this email address.")
+
+class ResetPasswordSerializer(serializers.Serializer):
+    token = serializers.UUIDField()
+    new_password = serializers.CharField(min_length=8, write_only=True)
+    confirm_password = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError("Passwords don't match.")
+        return data

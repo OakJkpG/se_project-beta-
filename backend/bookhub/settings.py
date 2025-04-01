@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#54x6t*cin_7-301e+9vw+&8fxc558*7nm1ruiz$*034ja)b)q'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# Allow all hosts in development, specific hosts in production
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    # Disable HTTPS redirect in development
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    ALLOWED_HOSTS = ['se-bookhub-be.onrender.com']
+    # Enable HTTPS in production
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 LOGIN_URL = '/adminpanel/login/'  # กำหนด URL ของหน้า login สำหรับ admin
 LOGIN_REDIRECT_URL = '/adminpanel/dashboard/'  # หลังจาก login สำเร็จให้ redirect ไปที่ dashboard
@@ -63,21 +85,28 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# อนุญาตให้ทุก origin เชื่อมต่อ (สำหรับพัฒนา)
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://se-bookhub.vercel.app"
+]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://se-project-beta-backend.onrender.com",
-    "https://se-project-beta-frontend-git-master-oakjkpgs-projects.vercel.app",
-    "https://se-project-beta-frontend.vercel.app",
+    "https://se-bookhub-be.onrender.com",
+    "https://se-bookhub.vercel.app"
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://se-project-beta-frontend.vercel.app",
-    "http://localhost:8000",
-]
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ORIGIN_ALLOW_ALL = True  # หรือจะระบุ URL ที่อนุญาตให้เชื่อมต่อจาก React โดยเฉพาะ
+# URLs Configuration
+FRONTEND_URLS = {
+    'development': 'http://localhost:5173',
+    'production': 'https://se-bookhub.vercel.app'
+}
+
+# Frontend URL based on environment
+FRONTEND_URL = os.getenv('FRONTEND_URL')
+
 # ตั้งค่า Email (สำหรับ demo ส่งไปที่ console)
 # ตั้งค่า Email Backend (ใช้ SMTP)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -86,8 +115,8 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"       # SMTP Server ของ Gmail
 EMAIL_PORT = 587                    # ใช้ Port 587 สำหรับ TLS
 EMAIL_USE_TLS = True                # เปิดใช้งาน TLS
-EMAIL_HOST_USER = "bookhub.noreply@gmail.com"  # อีเมลของคุณ
-EMAIL_HOST_PASSWORD = "asyi watf scne bjav" # รหัสผ่าน หรือ App Password (ดูข้อ 2)
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # อีเมลของคุณ
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') # รหัสผ่าน หรือ App Password (ดูข้อ 2)
 DEFAULT_FROM_EMAIL = "BookHub <bookhub.noreply@gmail.com>"  # ชื่อผู้ส่ง (เปลี่ยนได้)
 
 
@@ -122,30 +151,19 @@ WSGI_APPLICATION = 'bookhub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-#database
-import os
-import environ
-
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.csqtsflaklabqsnjlioy',
-        'PASSWORD': 'bookhubgroup10',
-        'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',
-        'PORT': '6543',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
 # ด้านบนไฟล์ settings.py
-import os
 import environ
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -154,19 +172,19 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # เพิ่มการตั้งค่า Storage ของ S3 (สำหรับ Supabase)
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_ACCESS_KEY_ID = 'd4f5b4d6ea21398b564a724e48e84a6e'
-AWS_SECRET_ACCESS_KEY = '11315d5a3fde55fbfd230bae63125d2bc802bdc5f5dd0f559786d3e23326aa9a'
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'Bookhub_media'  # Default bucket name
-AWS_STORAGE_BUCKET_NAME_MEDIA = 'Bookhub_media'
-AWS_STORAGE_BUCKET_NAME_PDF = 'Bookhub_pdf'
-AWS_S3_ENDPOINT_URL = 'https://csqtsflaklabqsnjlioy.supabase.co/storage/v1/s3'
+AWS_STORAGE_BUCKET_NAME_MEDIA = os.getenv('AWS_STORAGE_BUCKET_NAME_MEDIA')
+AWS_STORAGE_BUCKET_NAME_PDF = os.getenv('AWS_STORAGE_BUCKET_NAME_PDF')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_S3_REGION_NAME = 'ap-southeast-1'  # เพิ่ม Region
 
-SUPABASE_URL='https://csqtsflaklabqsnjlioy.supabase.co'
-SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzcXRzZmxha2xhYnFzbmpsaW95Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTU0NjExMywiZXhwIjoyMDU3MTIyMTEzfQ.5ShmiI7t-b8LTxKeh3TxE0RILSdG5Ss6a1WrkaxqaAI'
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
         
 
 # Password validation

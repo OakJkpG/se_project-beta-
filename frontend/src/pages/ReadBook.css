@@ -7,6 +7,8 @@
   overflow-x: hidden;
   background-color: #282828; /* Add black background */
   min-height: 100vh; /* Ensure full height coverage */
+  padding-top: 0;
+  position: relative;
 }
 
 .pdf-controls {
@@ -137,6 +139,43 @@
   height: auto !important;
 }
 
+/* Add new styles for the header section */
+.pdf-header {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #ff8533;
+  transform: translateX(-2px);
+}
+
+.back-button svg {
+  font-size: 1.2rem;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .pdf-controls {
@@ -150,5 +189,28 @@
 
   .zoom-controls {
     justify-content: center;
+  }
+
+  .pdf-header {
+    padding: 0.75rem;
+  }
+
+  .back-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-header {
+    padding: 0.5rem;
+  }
+
+  .back-button {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .back-button span {
+    display: none; /* Hide text on very small screens */
   }
 }

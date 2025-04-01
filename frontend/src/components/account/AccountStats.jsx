@@ -7,41 +7,41 @@ const AccountStats = ({ user }) => {
     <div className="account-stats">
       <h2>Account Statistics</h2>
       <div className="stats-grid">
-        <div className="stat-item">
-          <span className="stat-label">Name:</span>
-          <span className="stat-value">{user?.first_name || user?.username || 'N/A'}</span>
+        <div className="stat-item-account">
+          <span className="stat-label-account">Name:</span>
+          <span className="stat-value-account">{user?.name || 'N/A'}</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Email:</span>
-          <span className="stat-value">{user?.email || 'N/A'}</span>
+        <div className="stat-item-account">
+          <span className="stat-label-account">Email:</span>
+          <span className="stat-value-account">{user?.email || 'N/A'}</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Role:</span>
-          <span className="stat-value">{user?.role || 'N/A'}</span>
+        <div className="stat-item-account">
+          <span className="stat-label-account">Role:</span>
+          <span className="stat-value-account">{user?.role || 'N/A'}</span>
         </div>
         
         {user?.role === 'reader' ? (
           <>
-            <div className="stat-item">
-              <span className="stat-label">
+            <div className="stat-item-account">
+              <span className="stat-label-account">
                 <FaBookReader /> Books Borrowed:
               </span>
-              <span className="stat-value">{user?.borrow_count || 0}</span>
+              <span className="stat-value-account">{user?.borrow_count || 0}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">
+            <div className="stat-item-account">
+              <span className="stat-label-account">
                 <FaBookReader /> Currently Borrowing:
               </span>
-              <span className="stat-value">{user?.active_borrows || 0}</span>
+              <span className="stat-value-account">{user?.active_borrows || 0}</span>
             </div>
             
           </>
         ) : (
-          <div className="stat-item">
-            <span className="stat-label">
+          <div className="stat-item-account">
+            <span className="stat-label-account">
               <FaBook /> Published Books:
             </span>
-            <span className="stat-value">{user?.book_count || 0}</span>
+            <span className="stat-value-account">{user?.book_count || 0}</span>
           </div>
         )}
       </div>

@@ -10,10 +10,18 @@ yarn-debug.log
 
 # Environment variables
 .env
+backend/.env
 .env.local
 .env.development
 .env.test
 .env.production
+
+# Add these sensitive files
+.env*
+!.env.example
+*.key
+*.pem
+*_rsa
 
 # Python cache files
 admin_dashboard/__pycache__/

@@ -30,6 +30,13 @@ class Book(models.Model):
     def is_available(self):
         return self.remaining_borrows() > 0
 
+    def is_borrowed_by_user(self, user):
+        """Check if the book is currently borrowed by specific user"""
+        return self.borrows.filter(
+            reader=user,
+            returned_at__isnull=True
+        ).exists()
+
     def __str__(self):
         return self.title
 
